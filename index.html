@@ -5,273 +5,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comondi - توصيل الطلبات</title>
     
-    <!-- مكتبة الخرائط Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- مكتبة الأيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #FF5722; /* لون برتقالي رئيسي */
-            --secondary: #2196F3; /* لون أزرق ثانوي */
+            --primary: #FF5722;
+            --secondary: #2196F3;
             --bg: #f4f6f8;
             --text: #333;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95); /* شفافية بسيطة */
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
-        
-        /* زر تغيير اللغة */
-        .lang-switch { position: absolute; top: 15px; left: 15px; z-index: 2000; }
-        .lang-btn { background: #fff; border: 1px solid #ccc; padding: 5px 12px; cursor: pointer; border-radius: 20px; font-weight: bold; font-size: 12px; }
-        .lang-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; overflow-x: hidden; color: var(--text); }
 
-        /* الشاشات */
-        .screen { display: none; padding: 20px; max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--card-bg); box-shadow: 0 0 15px rgba(0,0,0,0.05); }
-        .active-screen { display: block; animation: fadeIn 0.4s ease-in-out; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 15px; }
-        
-        /* النماذج والأزرار */
-        .form-group { margin-bottom: 15px; }
-        label { font-weight: bold; font-size: 0.9em; color: #555; display: block; margin-bottom: 5px; }
-        input, select, button { width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 5px rgba(255, 87, 34, 0.2); }
-        
-        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 15px; }
-        button:hover { background: #E64A19; }
-        button.secondary { background: #fff; color: #555; border: 1px solid #ddd; }
-        button.secondary:hover { background: #f0f0f0; }
-
-        /* روابط الدخول والتسجيل */
-        .auth-link { text-align: center; margin-top: 20px; font-size: 0.9em; }
-        .auth-link span { color: var(--secondary); cursor: pointer; text-decoration: underline; }
-
-        /* لوحة تحكم الموصل (Dashboard Grid) */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+        /* --- 1. الخلفية المتحركة --- */
+        .bg-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: url('https://images.unsplash.com/photo-1613243555988-441166d4d6fd?q=80&w=1770&auto=format&fit=crop') no-repeat center center/cover;
+            animation: zoomEffect 20s infinite alternate;
         }
-        .stat-card {
-            background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px; text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: rgba(0, 0, 0, 0.5); /* تغميق الخلفية */
         }
-        .stat-card i { font-size: 24px; margin-bottom: 8px; }
-        .stat-card h4 { margin: 5px 0; font-size: 18px; color: #333; }
-        .stat-card p { margin: 0; font-size: 11px; color: #888; }
+        @keyframes zoomEffect {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
 
-        /* الخريطة */
-        #map-customer, #map-rider { height: 300px; width: 100%; border-radius: 12px; margin-top: 15px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        /* --- 2. شاشة البداية (Splash Screen) --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+            background: #fff;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.8s ease-out;
+        }
+        .splash-icons { display: flex; gap: 40px; font-size: 60px; margin-bottom: 20px; }
+        .icon-anim { animation: bounceIn 1.5s infinite alternate; }
+        .icon-anim:nth-child(2) { animation-delay: 0.2s; color: var(--primary); }
+        .icon-anim:nth-child(1) { color: var(--secondary); }
         
-        /* بطاقة الطلب */
-        .order-card { background: #fff; border-right: 4px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: slideIn 0.3s; }
-        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .price-badge { background: #4CAF50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; float: left; }
+        @keyframes bounceIn {
+            0% { transform: translateY(0); opacity: 0.5; }
+            100% { transform: translateY(-20px); opacity: 1; }
+        }
 
-        /* أزرار الحالة */
-        .status-steps button { margin-bottom: 8px; background: #f5f5f5; color: #333; text-align: right; padding-right: 15px; border: 1px solid #eee; }
-        .status-steps button.active-step { background: var(--secondary); color: white; border-color: var(--secondary); }
-        .status-steps button.done { background: #81C784; color: white; cursor: default; border-color: #81C784; }
+        /* --- التنسيقات العامة --- */
+        .screen { display: none; padding: 25px; max-width: 450px; margin: 40px auto; min-height: 80vh; 
+                  background: var(--card-bg); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+                  backdrop-filter: blur(5px); }
+        .active-screen { display: block; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* الفاتورة ورسائل الخطأ */
-        #invoice-preview, #customer-invoice-view { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; display: none; }
-        .error-msg { color: #d32f2f; font-size: 0.85em; text-align: center; display: none; margin-top: 8px; background: #ffebee; padding: 5px; border-radius: 4px; }
+        /* العناصر */
+        h1 { color: var(--primary); font-size: 2.5em; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); margin-bottom: 10px; }
+        input, select, button { width: 100%; padding: 14px; margin-top: 8px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; box-shadow: 0 4px 6px rgba(255,87,34,0.3); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(255,87,34,0.4); }
         
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .stat-card { background: #fff; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        #map-customer, #map-rider { height: 300px; width: 100%; border-radius: 12px; margin-top: 15px; border: 2px solid #fff; }
+        .order-card { background: #fff; border-right: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 25px; height: 25px; animation: spin 1s linear infinite; margin: 10px auto; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error-msg { color: #d32f2f; background: #ffcdd2; padding: 10px; border-radius: 5px; text-align: center; display: none; margin-top: 10px; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
-    <!-- تبديل اللغة -->
-    <div class="lang-switch">
-        <button class="lang-btn active" onclick="setLang('ar')">AR</button>
-        <button class="lang-btn" onclick="setLang('fr')">FR</button>
+    <!-- الخلفية المتحركة -->
+    <div class="bg-animation"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- شاشة الترحيب (Splash) -->
+    <div id="splash-screen">
+        <div class="splash-icons">
+            <i class="fas fa-motorcycle icon-anim"></i>
+            <i class="fas fa-user icon-anim"></i>
+        </div>
+        <h2 style="color:#333;">Comondi</h2>
+        <p>توصيل طعام سريع..</p>
     </div>
 
-    <!-- صوت الإشعار -->
+    <!-- الصوت -->
     <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
     <!-- 1. شاشة تسجيل الدخول -->
-    <div id="screen-login" class="screen active-screen">
-        <br><br>
+    <div id="screen-login" class="screen">
         <h1>Comondi</h1>
-        <h3 id="txt-login-title">تسجيل الدخول</h3>
+        <h3 style="color:#555;">مرحباً بعودتك</h3>
         
-        <input type="email" id="login-email" placeholder="البريد الإلكتروني (Email)">
-        <input type="password" id="login-pass" placeholder="كلمة المرور (Password)">
+        <input type="email" id="login-email" placeholder="البريد الإلكتروني">
+        <input type="password" id="login-pass" placeholder="كلمة المرور">
         
+        <button onclick="handleLogin()" id="btn-login">تسجيل الدخول</button>
         <p id="login-error" class="error-msg"></p>
-        <button onclick="handleLogin()" id="btn-login">دخول</button>
         
-        <div class="auth-link">
-            <span onclick="showScreen('screen-register')" id="lnk-create-acc">ليس لديك حساب؟ إنشاء حساب جديد</span>
+        <div style="text-align:center; margin-top:20px;">
+            <span onclick="showScreen('screen-register')" style="color:var(--secondary); cursor:pointer; text-decoration:underline;">إنشاء حساب جديد</span>
         </div>
     </div>
 
-    <!-- 2. شاشة إنشاء حساب (مع حل مشكلة التكرار) -->
+    <!-- 2. شاشة التسجيل -->
     <div id="screen-register" class="screen">
-        <br>
-        <h1>Comondi</h1>
-        <h3 id="txt-reg-title">إنشاء حساب جديد</h3>
-        
-        <div class="form-group">
-            <label id="lbl-role">أنت تسجل كـ:</label>
-            <select id="reg-role">
-                <option value="customer" id="opt-customer">زبون (Client)</option>
-                <option value="rider" id="opt-rider">موصل (Livreur)</option>
-            </select>
-        </div>
-
+        <h2>حساب جديد</h2>
+        <select id="reg-role">
+            <option value="customer">أنا زبون (Client)</option>
+            <option value="rider">أنا موصل (Livreur)</option>
+        </select>
         <input type="text" id="reg-name" placeholder="الاسم الكامل">
         <input type="tel" id="reg-phone" placeholder="رقم الهاتف">
         <input type="email" id="reg-email" placeholder="البريد الإلكتروني">
-        <input type="password" id="reg-pass" placeholder="كلمة المرور (6 أحرف على الأقل)">
+        <input type="password" id="reg-pass" placeholder="كلمة المرور (6+ أحرف)">
         
+        <button onclick="handleRegister()" id="btn-register">إنشاء الحساب</button>
         <p id="reg-error" class="error-msg"></p>
-        <button onclick="handleRegister()" id="btn-register">تسجيل</button>
         
-        <div class="auth-link">
-            <span onclick="showScreen('screen-login')" id="lnk-have-acc">لديك حساب؟ تسجيل دخول</span>
+        <div style="text-align:center; margin-top:15px;">
+            <span onclick="showScreen('screen-login')" style="color:var(--secondary); cursor:pointer;">لديك حساب بالفعل؟</span>
         </div>
     </div>
 
-    <!-- 3. شاشة الزبون: طلب جديد -->
+    <!-- 3. شاشة الزبون -->
     <div id="screen-customer" class="screen">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 id="txt-welcome-cust" style="margin:0; font-size:1.2em;">أهلاً</h2>
-            <button onclick="logout()" class="secondary" style="width:auto; margin:0; padding:5px 12px; font-size:0.8em;">خروج</button>
+            <h3 id="cust-welcome" style="margin:0">أهلاً</h3>
+            <button onclick="logout()" style="width:auto; padding:5px 15px; margin:0; background:#777;">خروج</button>
         </div>
-        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+        <hr style="margin:15px 0; border:0; border-top:1px solid #ddd;">
         
-        <h3 id="txt-new-order">طلب جديد</h3>
+        <h3>اطلب الآن</h3>
+        <input type="text" id="food-name" placeholder="اسم الأكل (بيتزا، طاكوس..)">
+        <input type="text" id="drink-name" placeholder="مشروب (اختياري)">
+        <input type="text" id="store-name" placeholder="اسم المحل">
         
-        <div class="form-group">
-            <label id="lbl-food">ماذا تريد أن تأكل؟</label>
-            <input type="text" id="food-name" placeholder="مثال: Tacos, Pizza...">
-        </div>
-        
-        <div class="form-group">
-            <label id="lbl-drink">المشروب (اختياري)</label>
-            <input type="text" id="drink-name" placeholder="مثال: Coca Cola...">
-        </div>
-
-        <div class="form-group">
-            <label id="lbl-store">اسم المحل</label>
-            <input type="text" id="store-name" placeholder="مثال: Adm Food...">
-        </div>
-        
-        <button onclick="createOrder()" id="btn-order-now">اطلب وشارك موقعك GPS</button>
+        <button onclick="createOrder()" id="btn-order-now">اطلب وشارك موقعك <i class="fas fa-location-arrow"></i></button>
         <div id="gps-loader" class="loader"></div>
         <p id="gps-error" class="error-msg"></p>
     </div>
 
-    <!-- 4. شاشة الزبون: تتبع الطلب -->
+    <!-- 4. شاشة التتبع للزبون -->
     <div id="screen-tracking" class="screen">
-        <h2 id="txt-tracking">تتبع طلبك</h2>
-        
-        <div style="text-align:center; padding:15px; background:#e3f2fd; border-radius:8px; border:1px solid #bbdefb;">
-            <p style="margin:0; font-weight:bold; color:var(--secondary); font-size:1.1em;" id="order-status-text">بانتظار القبول...</p>
+        <h3>حالة الطلب</h3>
+        <div style="background:#e3f2fd; padding:15px; border-radius:10px; text-align:center; color:var(--secondary); font-weight:bold;">
+            <span id="order-status-text">بانتظار القبول...</span>
         </div>
         
-        <div id="rider-info-box" class="hidden" style="margin-top:10px; padding:10px; background:#fff3e0; border-radius:8px; display:none;">
-            <p style="margin:5px 0"><i class="fas fa-motorcycle"></i> <strong>الموصل:</strong> <span id="rider-name-display">...</span></p>
-            <p style="margin:5px 0"><i class="fas fa-phone"></i> <span id="rider-phone-display">...</span></p>
+        <div id="rider-info-box" style="display:none; margin-top:10px; background:#fff8e1; padding:10px; border-radius:8px;">
+            <p><i class="fas fa-motorcycle"></i> الموصل: <b id="rider-name-display"></b></p>
+            <p><i class="fas fa-phone"></i> <b id="rider-phone-display"></b></p>
         </div>
 
         <div id="map-customer"></div>
-        
-        <div id="invoice-area" class="hidden" style="display:none;">
-            <h3 id="txt-invoice" style="margin-top:20px;">فاتورة المشتريات</h3>
-            <img id="customer-invoice-view" src="" alt="Invoice">
-        </div>
+        <img id="customer-invoice-view" src="" style="width:100%; border-radius:10px; margin-top:10px; display:none;">
     </div>
 
-    <!-- 5. شاشة الموصل: لوحة التحكم -->
+    <!-- 5. داشبورد الموصل -->
     <div id="screen-rider-dashboard" class="screen">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="margin:0;" id="txt-dash">لوحة التحكم</h2>
-            <button onclick="logout()" class="secondary" style="width:auto; margin:0; padding:5px 12px;"><i class="fas fa-sign-out-alt"></i></button>
+        <div style="display:flex; justify-content:space-between;">
+            <h3 id="rider-welcome" style="margin:0">لوحة التحكم</h3>
+            <button onclick="logout()" style="width:auto; background:#777; padding:5px 10px; margin:0;"><i class="fas fa-sign-out-alt"></i></button>
         </div>
-        <p style="text-align:center; color:#777; font-size:0.9em; margin-bottom:15px;" id="rider-welcome-name">...</p>
 
-        <!-- احصائيات 2x2 -->
         <div class="dashboard-grid">
-            <div class="stat-card">
-                <i class="fas fa-check-circle" style="color:var(--secondary);"></i>
-                <h4 id="stat-completed">0</h4>
-                <p id="txt-stat-comp">طلبات مكتملة</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-wallet" style="color:#4CAF50;"></i>
-                <h4 id="stat-earnings">0 DA</h4>
-                <p id="txt-stat-earn">الأرباح</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-star" style="color:#FFC107;"></i>
-                <h4>4.8</h4>
-                <p id="txt-stat-rate">التقييم</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-wifi" style="color:var(--primary);"></i>
-                <h4 id="txt-online" style="font-size:16px; margin-top:8px;">متصل</h4>
-                <p id="txt-stat-st">الحالة</p>
-            </div>
+            <div class="stat-card"><i class="fas fa-check fa-2x" style="color:green;"></i><h4 id="stat-comp">0</h4><small>مكتملة</small></div>
+            <div class="stat-card"><i class="fas fa-coins fa-2x" style="color:gold;"></i><h4 id="stat-earn">0</h4><small>الأرباح</small></div>
         </div>
 
-        <h3 style="text-align:right; font-size:1.1em; border-bottom:2px solid #eee; padding-bottom:5px;" id="txt-avail-orders">الطلبات الواردة</h3>
+        <h4>الطلبات الجديدة</h4>
         <div id="orders-list">
-            <p style="text-align:center; color:#999; margin-top:30px;" id="txt-no-orders">لا توجد طلبات حالياً...</p>
+            <p style="text-align:center; color:#999;">لا توجد طلبات حالياً</p>
         </div>
     </div>
 
-    <!-- 6. شاشة الموصل: المهمة الجارية -->
+    <!-- 6. شاشة الموصل (مهمة جارية) -->
     <div id="screen-rider-active" class="screen">
-        <h3 id="txt-mission">المهمة الحالية</h3>
-        
-        <div class="order-card" style="border-color:var(--secondary);">
-            <div style="display:flex; justify-content:space-between;">
-                <h4 style="margin:0" id="active-store">Store</h4>
-                <span style="background:var(--secondary); color:#fff; padding:2px 8px; border-radius:4px;">100 DA</span>
-            </div>
-            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
-            <p style="margin:5px 0;"><strong><i class="fas fa-hamburger"></i>:</strong> <span id="active-food"></span></p>
-            <p style="margin:5px 0;"><strong><i class="fas fa-wine-bottle"></i>:</strong> <span id="active-drink">--</span></p>
-            <p style="margin:5px 0;"><strong><i class="fas fa-user"></i>:</strong> <span id="active-cust-name">...</span></p>
-            
-            <a id="btn-call-cust" href="#" style="display:block; text-align:center; background:#4CAF50; color:white; padding:10px; text-decoration:none; border-radius:5px; margin-top:10px; font-weight:bold;">
-                <i class="fas fa-phone"></i> اتصال بالزبون
-            </a>
+        <h3>تفاصيل الطلب</h3>
+        <div class="order-card">
+            <h4 id="act-food" style="margin:0">...</h4>
+            <p id="act-store" style="color:#666;"></p>
+            <p><i class="fas fa-user"></i> <span id="act-cust"></span></p>
+            <a id="btn-call" href="#" style="display:block; text-align:center; background:#4CAF50; color:white; padding:8px; border-radius:5px; text-decoration:none;">اتصال بالزبون</a>
         </div>
 
         <div id="map-rider"></div>
 
-        <div class="status-steps" style="margin-top:20px;">
-            <p style="font-size:0.9em; color:#666; margin-bottom:5px;">تحديث حالة الطلب:</p>
-            
-            <button onclick="updateStatus('heading_to_store')" id="btn-st-1">1. أنا في الطريق للمحل</button>
-            <button onclick="updateStatus('ordered')" id="btn-st-2">2. تم شراء الطلب</button>
-            
-            <!-- رفع الفاتورة -->
-            <div style="background:#fff; padding:10px; border-radius:8px; margin-bottom:8px; border:1px dashed #ccc;">
-                <label style="font-size:0.85em; margin-bottom:5px;">3. تصوير الفاتورة (لإظهارها للزبون)</label>
-                <input type="file" id="invoice-file" accept="image/*" style="font-size:0.8em; padding:5px;">
-                <button onclick="uploadInvoice()" id="btn-upload" class="secondary" style="margin-top:5px; width:auto; font-size:0.85em;">رفع الصورة</button>
-                <img id="invoice-preview" src="">
+        <div style="margin-top:15px;">
+            <button onclick="updateStatus('heading_to_store')">1. في الطريق للمحل</button>
+            <button onclick="updateStatus('ordered')">2. تم الشراء</button>
+            <div style="background:#f9f9f9; padding:10px; margin:5px 0;">
+                <small>3. صورة الفاتورة</small>
+                <input type="file" id="invoice-file">
+                <button onclick="uploadInvoice()" style="background:#555;">رفع</button>
             </div>
-
-            <button onclick="updateStatus('delivering')" id="btn-st-4">4. تم الاستلام، أنا قادم إليك</button>
-            <button onclick="updateStatus('completed')" id="btn-st-5" style="background:#333; color:#fff;">5. تم التوصيل (إنهاء)</button>
+            <button onclick="updateStatus('delivering')">4. جاري التوصيل</button>
+            <button onclick="updateStatus('completed')" style="background:#333;">5. تم التسليم</button>
         </div>
     </div>
 
-    <!-- كود الجافاسكريبت والفايربيس -->
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, set, onChildAdded, onValue, update, runTransaction, get, query, orderByChild, equalTo } 
@@ -281,7 +218,7 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // إعدادات فايربيس الخاصة بك
+        // Config
         const firebaseConfig = {
             apiKey: "AIzaSyACuXD3szL8eudcmU5QtPWRT9Ha8k782DA",
             authDomain: "gouba-80f4c.firebaseapp.com",
@@ -291,439 +228,284 @@
             appId: "1:640752558914:web:75951a854ee68f4b3b1edb"
         };
 
-        // تهيئة فايربيس
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const storage = getStorage(app);
         const auth = getAuth(app);
-        
-        // متغيرات عامة
+
+        // Variables
         let currentUser = null;
         let userData = null;
-        let currentLang = 'ar';
-        let myOrderId = null;
-        let riderWatchId = null;
         let activeOrderData = null;
         let map = null, markers = {};
-        
-        // نصوص الترجمة
-        const texts = {
-            ar: {
-                loginTitle: "تسجيل الدخول", regTitle: "إنشاء حساب جديد",
-                cust: "زبون", rider: "موصل",
-                newOrder: "طلب جديد", food: "الأكل", drink: "المشروب", store: "المحل",
-                orderBtn: "اطلب وشارك موقعك", track: "تتبع الطلب",
-                waiting: "بانتظار القبول...", accepted: "تم قبول الطلب",
-                dash: "لوحة التحكم", avail: "الطلبات الواردة",
-                comp: "طلبات مكتملة", earn: "الأرباح", rate: "التقييم", st: "الحالة",
-                mission: "المهمة الحالية", noOrders: "لا توجد طلبات...",
-                online: "متصل"
-            },
-            fr: {
-                loginTitle: "Connexion", regTitle: "Créer un compte",
-                cust: "Client", rider: "Livreur",
-                newOrder: "Nouvelle Commande", food: "Plat", drink: "Boisson", store: "Magasin",
-                orderBtn: "Commander & Partager GPS", track: "Suivi",
-                waiting: "En attente...", accepted: "Commande acceptée",
-                dash: "Tableau de bord", avail: "Commandes reçues",
-                comp: "Commandes finies", earn: "Gains", rate: "Avis", st: "Statut",
-                mission: "Mission en cours", noOrders: "Aucune commande...",
-                online: "En ligne"
+        let myOrderId = null;
+        let riderWatchId = null;
+
+        // --- Splash Logic ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 800);
+            }, 2500); // تظهر لمدة 2.5 ثانية
+        });
+
+        // --- Auth Logic (Fixed) ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                // جلب البيانات مع التعامل مع الأخطاء
+                get(ref(db, 'users/' + user.uid))
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        userData = snapshot.val();
+                        if (userData.role === 'customer') {
+                            showScreen('screen-customer');
+                            document.getElementById('cust-welcome').innerText = "مرحباً " + userData.name;
+                        } else {
+                            showScreen('screen-rider-dashboard');
+                            document.getElementById('rider-welcome').innerText = userData.name;
+                            initRiderDashboard();
+                        }
+                    } else {
+                        // حالة نادرة: الحساب موجود في Auth لكن بياناته محذوفة من Database
+                        alert("خطأ: بيانات المستخدم غير موجودة. يرجى إنشاء حساب جديد.");
+                        signOut(auth);
+                        showScreen('screen-login');
+                    }
+                })
+                .catch((error) => {
+                    // هنا يتم حل مشكلة "التعليق" في حال فشل الاتصال بقاعدة البيانات
+                    console.error(error);
+                    alert("فشل الاتصال بقاعدة البيانات. تأكد من اتصال الإنترنت.");
+                    document.getElementById('btn-login').innerText = "دخول";
+                    document.getElementById('btn-login').disabled = false;
+                });
+            } else {
+                // إذا لم يكن مسجلاً، اذهب لشاشة الدخول (بعد انتهاء السبلاش)
+                // نستخدم Timeout بسيط لضمان عدم ظهورها فوق السبلاش فوراً
+                setTimeout(() => {
+                    if(document.getElementById('splash-screen').style.display === 'none') {
+                        showScreen('screen-login'); 
+                    } else {
+                        // إذا السبلاش لا يزال يعمل، الشاشة ستظهر تحته تلقائياً
+                        document.getElementById('screen-login').classList.add('active-screen');
+                    }
+                }, 100);
             }
+        });
+
+        window.handleLogin = () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const btn = document.getElementById('btn-login');
+            const errBox = document.getElementById('login-error');
+
+            if(!email || !pass) return;
+            
+            btn.innerText = "جاري الاتصال...";
+            btn.disabled = true;
+            errBox.style.display = 'none';
+
+            signInWithEmailAndPassword(auth, email, pass)
+            .catch((error) => {
+                btn.innerText = "تسجيل الدخول";
+                btn.disabled = false;
+                let msg = "خطأ في المعلومات";
+                if(error.code === 'auth/invalid-credential') msg = "البريد أو كلمة المرور خطأ";
+                if(error.code === 'auth/network-request-failed') msg = "تأكد من الإنترنت";
+                errBox.innerText = msg;
+                errBox.style.display = 'block';
+            });
+            // ملاحظة: إذا نجح، onAuthStateChanged سيعمل تلقائياً
         };
 
-        // --- دوال المصادقة (Auth) ---
-        
-        // دالة إنشاء الحساب (المحسنة مع معالجة الأخطاء)
         window.handleRegister = () => {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const name = document.getElementById('reg-name').value;
             const phone = document.getElementById('reg-phone').value;
             const role = document.getElementById('reg-role').value;
-            const errBox = document.getElementById('reg-error');
             const btn = document.getElementById('btn-register');
-
-            if(!email || !pass || !name || !phone) {
-                errBox.innerText = "يرجى ملء جميع الحقول"; errBox.style.display='block'; return;
-            }
-
+            
+            if(!name || !phone || !email || !pass) { alert("أدخل كل المعلومات"); return; }
+            
+            btn.innerText = "جاري الانشاء...";
             btn.disabled = true;
-            btn.innerText = "جاري التسجيل...";
 
             createUserWithEmailAndPassword(auth, email, pass)
-            .then((userCredential) => {
-                const uid = userCredential.user.uid;
-                // حفظ بيانات المستخدم في قاعدة البيانات
-                set(ref(db, 'users/' + uid), {
-                    name: name,
-                    phone: phone,
-                    role: role,
-                    email: email
-                }).then(() => {
-                    // الانتقال التلقائي سيحدث عبر مراقب الحالة
+            .then((cred) => {
+                set(ref(db, 'users/' + cred.user.uid), {
+                    name: name, phone: phone, role: role, email: email
                 });
             })
-            .catch((error) => {
+            .catch((err) => {
+                btn.innerText = "إنشاء الحساب";
                 btn.disabled = false;
-                btn.innerText = "تسجيل";
-                
-                let msg = "حدث خطأ غير معروف";
-                // ترجمة الأخطاء
-                if (error.code === 'auth/email-already-in-use') {
-                    msg = "هذا البريد الإلكتروني مسجل بالفعل! حاول تسجيل الدخول.";
-                } else if (error.code === 'auth/weak-password') {
-                    msg = "كلمة المرور ضعيفة (يجب أن تكون 6 خانات على الأقل).";
-                } else if (error.code === 'auth/invalid-email') {
-                    msg = "صيغة البريد الإلكتروني غير صحيحة.";
-                } else if (error.code === 'auth/network-request-failed') {
-                    msg = "تأكد من اتصالك بالإنترنت.";
-                }
-
-                errBox.innerText = msg;
-                errBox.style.display='block';
+                document.getElementById('reg-error').innerText = err.message;
+                document.getElementById('reg-error').style.display = 'block';
             });
         };
 
-        // دالة تسجيل الدخول
-        window.handleLogin = () => {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            const errBox = document.getElementById('login-error');
-            const btn = document.getElementById('btn-login');
+        window.logout = () => signOut(auth).then(() => window.location.reload());
 
-            if(!email || !pass) { errBox.innerText = "أدخل البريد وكلمة المرور"; errBox.style.display='block'; return; }
-
-            btn.disabled = true; 
-            btn.innerText = "جاري الدخول...";
-
-            signInWithEmailAndPassword(auth, email, pass)
-            .catch((error) => {
-                btn.disabled = false;
-                btn.innerText = "دخول";
-                let msg = "خطأ في البريد أو كلمة المرور";
-                if(error.code === 'auth/network-request-failed') msg = "تأكد من الانترنت";
-                errBox.innerText = msg;
-                errBox.style.display='block';
-            });
-        };
-
-        window.logout = () => {
-            signOut(auth).then(() => window.location.reload());
-        };
-
-        // مراقب حالة الدخول (يوجه المستخدم للشاشة المناسبة)
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                get(ref(db, 'users/' + user.uid)).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        userData = snapshot.val();
-                        if (userData.role === 'customer') {
-                            showScreen('screen-customer');
-                            document.getElementById('txt-welcome-cust').innerText = "مرحباً " + userData.name;
-                        } else {
-                            showScreen('screen-rider-dashboard');
-                            document.getElementById('rider-welcome-name').innerText = userData.name;
-                            initRiderDashboard();
-                        }
-                    } else {
-                         // في حال تم حذف المستخدم من قاعدة البيانات وبقي في Auth
-                        showScreen('screen-login');
-                    }
-                });
-            } else {
-                showScreen('screen-login');
-            }
-        });
-
-        // --- منطق الزبون (Customer) ---
+        // --- Customer Functions ---
         window.createOrder = () => {
             const food = document.getElementById('food-name').value;
-            const drink = document.getElementById('drink-name').value;
             const store = document.getElementById('store-name').value;
-            const errBox = document.getElementById('gps-error');
-            const loader = document.getElementById('gps-loader');
+            if(!food || !store) return alert("أدخل اسم الأكل والمحل");
 
-            if(!food || !store) {
-                alert("يرجى إدخال اسم الأكل واسم المحل");
-                return;
-            }
+            document.getElementById('btn-order-now').style.display = 'none';
+            document.getElementById('gps-loader').style.display = 'block';
 
-            errBox.style.display = 'none';
-            loader.style.display = 'block';
-            document.getElementById('btn-order-now').disabled = true;
-
-            if (!navigator.geolocation) {
-                handleLocationError("المتصفح لا يدعم GPS");
-                return;
-            }
-
-            // طلب الموقع
-            navigator.geolocation.getCurrentPosition((position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-
-                const newOrderRef = push(ref(db, 'orders'));
-                myOrderId = newOrderRef.key;
-
-                set(newOrderRef, {
-                    customerId: currentUser.uid,
-                    customerName: userData.name,
-                    customerPhone: userData.phone,
-                    foodName: food,
-                    drinkName: drink || "",
-                    storeName: store,
-                    customerLat: lat,
-                    customerLng: lng,
-                    status: 'pending',
-                    price: 100,
-                    timestamp: Date.now()
-                }).then(() => {
-                    loader.style.display = 'none';
-                    showScreen('screen-tracking');
-                    initMap('map-customer', lat, lng, false);
-                    listenToMyOrder();
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const newOrd = push(ref(db, 'orders'));
+                    myOrderId = newOrd.key;
+                    set(newOrd, {
+                        custId: currentUser.uid, custName: userData.name, custPhone: userData.phone,
+                        food: food, drink: document.getElementById('drink-name').value, store: store,
+                        lat: pos.coords.latitude, lng: pos.coords.longitude,
+                        status: 'pending', price: 100
+                    }).then(() => {
+                        showScreen('screen-tracking');
+                        initMap('map-customer', pos.coords.latitude, pos.coords.longitude);
+                        trackMyOrder();
+                    });
+                }, (err) => {
+                    alert("يجب تفعيل GPS (أو استخدم HTTPS)");
+                    document.getElementById('btn-order-now').style.display = 'block';
+                    document.getElementById('gps-loader').style.display = 'none';
                 });
-
-            }, (error) => {
-                let msg = "فشل تحديد الموقع.";
-                if(error.code === 1) msg = "يجب السماح للموقع من إعدادات المتصفح.";
-                else if(error.code === 2) msg = "تأكد من تشغيل GPS.";
-                // رسالة خاصة بمشكلة HTTP
-                if(window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-                    msg += " (ملاحظة: GPS لا يعمل إلا على HTTPS)";
-                }
-                handleLocationError(msg);
-            }, { enableHighAccuracy: true });
+            }
         };
 
-        function handleLocationError(msg) {
-            document.getElementById('gps-loader').style.display = 'none';
-            document.getElementById('btn-order-now').disabled = false;
-            document.getElementById('gps-error').innerText = msg;
-            document.getElementById('gps-error').style.display = 'block';
-            alert(msg);
-        }
-
-        function listenToMyOrder() {
-            const orderRef = ref(db, 'orders/' + myOrderId);
-            onValue(orderRef, (snapshot) => {
-                const data = snapshot.val();
-                if(!data) return;
-
-                const statusTxt = document.getElementById('order-status-text');
+        function trackMyOrder() {
+            onValue(ref(db, 'orders/' + myOrderId), (snap) => {
+                const d = snap.val();
+                if(!d) return;
                 
-                let stDisp = data.status;
-                if(stDisp === 'pending') stDisp = texts[currentLang].waiting;
-                else if(stDisp === 'completed') {
-                    stDisp = "تم التوصيل بنجاح!";
-                    alert("وصل طلبك! شكراً لاستخدام Comondi");
-                } else {
-                    stDisp = texts[currentLang].accepted;
-                    // عرض بيانات الموصل
-                    if(data.riderName) {
-                        document.getElementById('rider-info-box').style.display = 'block';
-                        document.getElementById('rider-name-display').innerText = data.riderName;
-                        document.getElementById('rider-phone-display').innerText = data.riderPhone;
-                    }
-                    if(data.riderLat) {
-                        updateMarker('rider', data.riderLat, data.riderLng);
-                    }
+                let st = d.status;
+                if(st === 'accepted') st = "تم قبول الطلب!";
+                if(st === 'delivering') st = "الموصل في الطريق إليك";
+                if(st === 'completed') { alert("وصل الطلب!"); st = "تم الاستلام"; }
+                
+                document.getElementById('order-status-text').innerText = st;
+                
+                if(d.riderId) {
+                    document.getElementById('rider-info-box').style.display = 'block';
+                    document.getElementById('rider-name-display').innerText = d.riderName;
+                    document.getElementById('rider-phone-display').innerText = d.riderPhone;
+                    updateMapMarker('rider', d.riderLat, d.riderLng);
                 }
-                statusTxt.innerText = stDisp;
-
-                // عرض الفاتورة
-                if(data.invoiceUrl) {
-                    document.getElementById('invoice-area').style.display = 'block';
-                    document.getElementById('customer-invoice-view').src = data.invoiceUrl;
-                    document.getElementById('customer-invoice-view').style.display = 'block';
+                if(d.invoiceUrl) {
+                    const img = document.getElementById('customer-invoice-view');
+                    img.src = d.invoiceUrl;
+                    img.style.display = 'block';
                 }
             });
         }
 
-        // --- منطق الموصل (Rider) ---
+        // --- Rider Functions ---
         function initRiderDashboard() {
-            // حساب الإحصائيات
-            const ordersQuery = query(ref(db, 'orders'), orderByChild('riderId'), equalTo(currentUser.uid));
-            onValue(ordersQuery, (snapshot) => {
-                let completedCount = 0;
-                snapshot.forEach(child => {
-                    if(child.val().status === 'completed') completedCount++;
-                });
-                document.getElementById('stat-completed').innerText = completedCount;
-                document.getElementById('stat-earnings').innerText = (completedCount * 100) + " DA";
-            });
-
-            // الاستماع للطلبات الجديدة
-            const allOrdersRef = ref(db, 'orders');
-            onValue(allOrdersRef, (snap) => {
+            // New orders
+            onValue(ref(db, 'orders'), (snap) => {
                 const list = document.getElementById('orders-list');
-                list.innerHTML = ""; 
-                let hasOrders = false;
-
-                snap.forEach(child => {
-                    const o = child.val();
-                    const key = child.key;
+                list.innerHTML = "";
+                snap.forEach(c => {
+                    const o = c.val();
                     if(o.status === 'pending') {
-                        hasOrders = true;
-                        // تشغيل صوت عند ظهور طلب جديد في القائمة
-                        // (ملاحظة: المتصفحات قد تمنع الصوت بدون تفاعل مسبق)
-                        
+                        document.getElementById('notif-sound').play().catch(()=>{});
                         const div = document.createElement('div');
                         div.className = 'order-card';
-                        div.innerHTML = `
-                            <div style="overflow:hidden; margin-bottom:5px;">
-                                <span class="price-badge">${o.price} DA</span>
-                                <h4 style="margin:0 10px; display:inline-block;">${o.foodName}</h4>
-                            </div>
-                            <p style="font-size:0.9em; color:#666; margin:5px 0;">
-                                <i class="fas fa-store"></i> ${o.storeName}<br>
-                                <i class="fas fa-user"></i> ${o.customerName}
-                            </p>
-                            <button onclick="window.acceptOrder('${key}')">قبول الطلب</button>
-                        `;
+                        div.innerHTML = `<h4>${o.food} (${o.price} DA)</h4><p>${o.store}</p>
+                        <button onclick="window.takeOrder('${c.key}')">قبول</button>`;
                         list.appendChild(div);
                     }
                 });
-
-                if(!hasOrders) list.innerHTML = `<p style="text-align:center;color:#999;margin-top:30px;">${texts[currentLang].noOrders}</p>`;
             });
+            // Stats (Demo)
+            document.getElementById('stat-comp').innerText = "5"; 
+            document.getElementById('stat-earn').innerText = "500";
         }
 
-        window.acceptOrder = (orderId) => {
-            document.getElementById('notif-sound').play().catch(()=>{}); // محاولة تشغيل الصوت
-            const orderRef = ref(db, 'orders/' + orderId);
-            
-            runTransaction(orderRef, (currentData) => {
-                if (currentData && currentData.status === 'pending') {
-                    currentData.status = 'accepted';
-                    currentData.riderId = currentUser.uid;
-                    currentData.riderName = userData.name;
-                    currentData.riderPhone = userData.phone;
-                    return currentData;
-                } else {
-                    return; // تم قبوله من شخص آخر
+        window.takeOrder = (key) => {
+            runTransaction(ref(db, 'orders/' + key), (curr) => {
+                if(curr && curr.status === 'pending') {
+                    curr.status = 'accepted';
+                    curr.riderId = currentUser.uid;
+                    curr.riderName = userData.name;
+                    curr.riderPhone = userData.phone;
+                    return curr;
                 }
-            }).then((result) => {
-                if (result.committed) {
-                    activeOrderData = result.snapshot.val();
-                    activeOrderData.key = orderId;
-                    startMission();
-                } else {
-                    alert("عذراً، تم قبول الطلب من شخص آخر.");
+            }).then((res) => {
+                if(res.committed) {
+                    activeOrderData = res.snapshot.val();
+                    activeOrderData.key = key;
+                    showScreen('screen-rider-active');
+                    setupActiveOrder();
                 }
             });
         };
 
-        function startMission() {
-            showScreen('screen-rider-active');
+        function setupActiveOrder() {
+            document.getElementById('act-food').innerText = activeOrderData.food;
+            document.getElementById('act-store').innerText = activeOrderData.store;
+            document.getElementById('act-cust').innerText = activeOrderData.custName;
+            document.getElementById('btn-call').href = "tel:" + activeOrderData.custPhone;
             
-            document.getElementById('active-store').innerText = activeOrderData.storeName;
-            document.getElementById('active-food').innerText = activeOrderData.foodName;
-            document.getElementById('active-drink').innerText = activeOrderData.drinkName || "--";
-            document.getElementById('active-cust-name').innerText = activeOrderData.customerName;
-            document.getElementById('btn-call-cust').href = "tel:" + activeOrderData.customerPhone;
-
-            initMap('map-rider', activeOrderData.customerLat, activeOrderData.customerLng, true);
-
-            // بدء تتبع موقع الموصل
+            initMap('map-rider', activeOrderData.lat, activeOrderData.lng);
+            
             if(navigator.geolocation) {
-                riderWatchId = navigator.geolocation.watchPosition((pos) => {
-                    const rLat = pos.coords.latitude;
-                    const rLng = pos.coords.longitude;
-
-                    updateMarker('rider', rLat, rLng);
-                    
+                riderWatchId = navigator.geolocation.watchPosition(p => {
                     update(ref(db, 'orders/' + activeOrderData.key), {
-                        riderLat: rLat,
-                        riderLng: rLng
+                        riderLat: p.coords.latitude, riderLng: p.coords.longitude
                     });
-
-                }, null, {enableHighAccuracy: true});
+                    updateMapMarker('rider', p.coords.latitude, p.coords.longitude);
+                });
             }
         }
 
-        window.updateStatus = (newSt) => {
-            if(!activeOrderData) return;
-            
-            const btnIdMap = {'heading_to_store':'btn-st-1', 'ordered':'btn-st-2', 'delivering':'btn-st-4', 'completed':'btn-st-5'};
-            if(btnIdMap[newSt]) document.getElementById(btnIdMap[newSt]).classList.add('done');
-
-            update(ref(db, 'orders/' + activeOrderData.key), { status: newSt });
-
-            if(newSt === 'completed') {
-                if(riderWatchId) navigator.geolocation.clearWatch(riderWatchId);
-                alert("عمل رائع! تم إنهاء المهمة.");
-                setTimeout(() => {
-                    showScreen('screen-rider-dashboard');
-                }, 2000);
+        window.updateStatus = (st) => {
+            update(ref(db, 'orders/' + activeOrderData.key), { status: st });
+            if(st === 'completed') {
+                navigator.geolocation.clearWatch(riderWatchId);
+                alert("تمت المهمة!");
+                showScreen('screen-rider-dashboard');
             }
         };
 
         window.uploadInvoice = () => {
             const file = document.getElementById('invoice-file').files[0];
-            const btn = document.getElementById('btn-upload');
-            if(!file) return alert("اختر صورة أولاً");
-            
-            btn.innerText = "جاري الرفع...";
-            const sRefImg = sRef(storage, 'invoices/' + activeOrderData.key + '_' + Date.now());
-            
-            uploadBytes(sRefImg, file).then((snap) => {
-                getDownloadURL(snap.ref).then((url) => {
+            if(!file) return;
+            uploadBytes(sRef(storage, `inv/${Date.now()}`), file).then(s => {
+                getDownloadURL(s.ref).then(url => {
                     update(ref(db, 'orders/' + activeOrderData.key), { invoiceUrl: url });
-                    document.getElementById('invoice-preview').src = url;
-                    document.getElementById('invoice-preview').style.display = 'block';
-                    btn.innerText = "تم الرفع بنجاح";
-                    btn.disabled = true;
+                    alert("تم الرفع");
                 });
-            }).catch(err => {
-                alert("فشل الرفع: " + err.message);
-                btn.innerText = "حاول مرة أخرى";
             });
         };
 
-        // --- أدوات مساعدة ---
+        // --- Helpers ---
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(id).classList.add('active-screen');
-            setTimeout(() => { if(map) map.invalidateSize(); }, 500);
+            setTimeout(() => { if(map) map.invalidateSize(); }, 300);
         };
 
-        window.setLang = (l) => {
-            currentLang = l;
-            document.dir = l === 'ar' ? 'rtl' : 'ltr';
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            for (const [key, val] of Object.entries(texts[l])) {
-                const el = document.getElementById('txt-' + key) || document.getElementById('lbl-' + key);
-                if(el) el.innerText = val;
-            }
-        };
-
-        // إعداد الخرائط
-        const custIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/3003/3003984.png', iconSize:[40,40]}); // أيقونة الزبون
-        const bikeIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/713/713311.png', iconSize:[40,40]}); // أيقونة الدراجة
-
-        function initMap(divId, lat, lng, isRiderView) {
-            if(map) { map.remove(); markers = {}; }
-            map = L.map(divId).setView([lat, lng], 15);
+        function initMap(div, lat, lng) {
+            if(map) { map.remove(); markers={}; }
+            map = L.map(div).setView([lat, lng], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-            markers['customer'] = L.marker([lat, lng], {icon: custIcon}).addTo(map)
-                .bindPopup(isRiderView ? "الزبون" : "موقعك").openPopup();
+            markers['cust'] = L.marker([lat, lng]).addTo(map).bindPopup("الزبون").openPopup();
         }
 
-        function updateMarker(type, lat, lng) {
+        function updateMapMarker(type, lat, lng) {
             if(!map) return;
-            if(markers[type]) {
-                markers[type].setLatLng([lat, lng]);
-            } else {
-                let icon = type === 'rider' ? bikeIcon : custIcon;
-                markers[type] = L.marker([lat, lng], {icon: icon}).addTo(map);
-            }
-            if(type === 'rider') map.panTo([lat, lng]);
+            const icon = L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png', iconSize:[40,40]});
+            if(markers[type]) markers[type].setLatLng([lat, lng]);
+            else markers[type] = L.marker([lat, lng], {icon: icon}).addTo(map);
+            map.panTo([lat, lng]);
         }
     </script>
 </body>
