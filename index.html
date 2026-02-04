@@ -3,241 +3,551 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر جوبا - تسوق أونلاين</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Comondi - توصيل الطعام</title>
+    
+    <!-- CSS Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #FF5722;
+            --secondary: #2196F3;
+            --bg: #f4f4f4;
+            --text: #333;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+        
+        /* Language Toggle */
+        .lang-switch { position: absolute; top: 10px; left: 10px; z-index: 1000; }
+        .lang-btn { background: #fff; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; }
+        .lang-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* Screens */
+        .screen { display: none; padding: 20px; max-width: 600px; margin: 0 auto; min-height: 100vh; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .active-screen { display: block; }
+
+        h1, h2 { text-align: center; color: var(--primary); }
+        
+        /* Forms */
+        .form-group { margin-bottom: 15px; }
+        input, select, button { width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #E64A19; }
+        
+        /* Role Selection */
+        .role-card { text-align: center; padding: 20px; border: 2px solid #eee; margin: 10px 0; cursor: pointer; border-radius: 10px; }
+        .role-card:hover { border-color: var(--primary); }
+
+        /* Map */
+        #map-customer, #map-rider { height: 300px; width: 100%; border-radius: 10px; margin-top: 10px; }
+        
+        /* Order Card (Rider) */
+        .order-card { background: #fff4e5; border: 1px solid #ffcc80; padding: 15px; margin-bottom: 10px; border-radius: 8px; animation: slideIn 0.5s; }
+        .price-tag { float: left; background: green; color: white; padding: 2px 8px; border-radius: 4px; }
+        
+        /* Status Steps */
+        .status-steps button { margin-bottom: 5px; background: var(--secondary); }
+        .status-steps button.done { background: gray; cursor: not-allowed; }
+
+        /* Invoice Image */
+        #invoice-preview, #customer-invoice-view { max-width: 100%; margin-top: 10px; border-radius: 5px; display: none; }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Utilities */
+        .hidden { display: none !important; }
+        .loader { text-align: center; margin: 20px; }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <img src="https://via.placeholder.com/60x60/FF6B35/ffffff?text=G" alt="Logo" class="logo" id="storeLogo">
-                    <h1 class="store-name" id="storeName">متجر جوبا</h1>
-                </div>
-                
-                <nav class="main-nav">
-                    <a href="#home">الرئيسية</a>
-                    <a href="#products">المنتجات</a>
-                    <a href="#offers">العروض</a>
-                    <a href="#about">من نحن</a>
-                </nav>
-                
-                <div class="header-actions">
-                    <button class="icon-btn" id="cartBtn">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </button>
-                    <button class="btn-secondary" id="loginBtn">تسجيل الدخول</button>
-                    <button class="btn-primary" id="registerBtn">إنشاء حساب</button>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Slider Section -->
-    <section class="slider-section">
-        <div class="slider">
-            <div class="slide active">
-                <img src="https://via.placeholder.com/1920x600/FF6B35/ffffff?text=عرض+خاص+1" alt="Slide 1">
-            </div>
-            <div class="slide">
-                <img src="https://via.placeholder.com/1920x600/4ECDC4/ffffff?text=عرض+خاص+2" alt="Slide 2">
-            </div>
-            <div class="slide">
-                <img src="https://via.placeholder.com/1920x600/FFE66D/ffffff?text=عرض+خاص+3" alt="Slide 3">
-            </div>
-        </div>
-        <div class="slider-dots">
-            <span class="dot active" data-slide="0"></span>
-            <span class="dot" data-slide="1"></span>
-            <span class="dot" data-slide="2"></span>
-        </div>
-    </section>
+    <!-- Language Switcher -->
+    <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('ar')">AR</button>
+        <button class="lang-btn" onclick="setLang('fr')">FR</button>
+    </div>
 
-    <!-- Scrolling Banner -->
-    <div class="scrolling-banner">
-        <div class="banner-content" id="bannerText">
-            <span>🔥 استفد من عرض اليوم (عرض محدود) 🔥 خصم يصل إلى 50% 🔥 شحن مجاني للطلبات فوق 500 دج 🔥 استفد من عرض اليوم (عرض محدود) 🔥</span>
+    <!-- Audio for Notification -->
+    <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+    <!-- 1. Selection Screen -->
+    <div id="screen-select" class="screen active-screen">
+        <h1 id="txt-welcome">Comondi</h1>
+        <p style="text-align:center" id="txt-choose-role">اختر هويتك</p>
+        
+        <div class="role-card" onclick="showScreen('screen-customer')">
+            <i class="fas fa-user fa-3x"></i>
+            <h3 id="txt-iam-customer">أنا زبون (Client)</h3>
+        </div>
+        
+        <div class="role-card" onclick="showScreen('screen-rider-login')">
+            <i class="fas fa-motorcycle fa-3x"></i>
+            <h3 id="txt-iam-rider">أنا موصل (Livreur)</h3>
         </div>
     </div>
 
-    <!-- Category Filter -->
-    <section class="categories-section">
-        <div class="container">
-            <div class="categories-scroll">
-                <button class="category-btn active" data-category="all">الكل</button>
-                <button class="category-btn" data-category="ملابس">ملابس</button>
-                <button class="category-btn" data-category="إلكترونيات">إلكترونيات</button>
-                <button class="category-btn" data-category="إكسسوارات">إكسسوارات</button>
-                <button class="category-btn" data-category="منزل">منزل</button>
-            </div>
+    <!-- 2. Customer Screen: Create Order -->
+    <div id="screen-customer" class="screen">
+        <button onclick="showScreen('screen-select')" style="background:#999; width:auto; margin-bottom:10px;">&larr;</button>
+        <h2 id="txt-new-order">طلب جديد</h2>
+        
+        <div class="form-group">
+            <label id="lbl-food">اسم الأكل (مثل: Tacos, Sandwich)</label>
+            <input type="text" id="food-name" placeholder="...">
         </div>
-    </section>
-
-    <!-- Products Section -->
-    <section class="products-section">
-        <div class="container">
-            <h2 class="section-title">منتجاتنا المميزة</h2>
-            <div class="products-grid" id="productsGrid">
-                <!-- Products will be loaded dynamically -->
-            </div>
+        <div class="form-group">
+            <label id="lbl-store">اسم المحل (مثل: Adm Food)</label>
+            <input type="text" id="store-name" placeholder="...">
         </div>
-    </section>
+        
+        <button onclick="createOrder()" id="btn-order-now">اطلب الآن (مشاركة الموقع GPS)</button>
+        <div id="customer-status" class="loader hidden"></div>
+    </div>
 
-    <!-- Shipping Info Animation -->
-    <section class="shipping-section">
-        <div class="container">
-            <div class="shipping-grid">
-                <div class="shipping-card">
-                    <div class="shipping-icon">
-                        <i class="fas fa-shipping-fast"></i>
-                    </div>
-                    <h3>شحن سريع</h3>
-                    <p>توصيل خلال 24-48 ساعة</p>
-                </div>
-                <div class="shipping-card">
-                    <div class="shipping-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>دفع آمن</h3>
-                    <p>جميع المعاملات محمية</p>
-                </div>
-                <div class="shipping-card">
-                    <div class="shipping-icon">
-                        <i class="fas fa-undo"></i>
-                    </div>
-                    <h3>إرجاع مجاني</h3>
-                    <p>خلال 14 يوم من الاستلام</p>
-                </div>
-                <div class="shipping-card">
-                    <div class="shipping-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>دعم 24/7</h3>
-                    <p>نحن هنا لمساعدتك</p>
-                </div>
-            </div>
+    <!-- 3. Customer Screen: Tracking -->
+    <div id="screen-tracking" class="screen">
+        <h2 id="txt-tracking">تتبع الطلب</h2>
+        <div id="tracking-info">
+            <p><strong>Status:</strong> <span id="order-status-text">بانتظار القبول...</span></p>
+            <p id="rider-phone-display" class="hidden"><i class="fas fa-phone"></i> <span id="rider-phone-val"></span></p>
+        </div>
+        <div id="map-customer"></div>
+        
+        <div id="invoice-area" class="hidden">
+            <h3 id="txt-invoice">صورة الفاتورة</h3>
+            <img id="customer-invoice-view" src="" alt="Invoice">
+        </div>
+    </div>
+
+    <!-- 4. Rider Screen: Login/Dashboard -->
+    <div id="screen-rider-login" class="screen">
+        <button onclick="showScreen('screen-select')" style="background:#999; width:auto; margin-bottom:10px;">&larr;</button>
+        <h2 id="txt-rider-login">دخول الموصلين</h2>
+        <input type="text" id="rider-name" placeholder="اسمك">
+        <input type="tel" id="rider-phone" placeholder="رقم هاتفك">
+        <button onclick="riderLogin()" id="btn-start-work">ابدأ العمل</button>
+    </div>
+
+    <div id="screen-rider-dashboard" class="screen">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 id="txt-avail-orders">الطلبات المتاحة</h2>
+            <small id="rider-status-dot" style="color:green;">● متصل</small>
+        </div>
+        <div id="orders-list">
+            <!-- Orders will appear here -->
+            <p style="text-align:center; color:#999;" id="txt-waiting-orders">في انتظار طلبات...</p>
+        </div>
+    </div>
+
+    <!-- 5. Rider Screen: Active Order -->
+    <div id="screen-rider-active" class="screen">
+        <h2 id="txt-active-mission">مهمة جارية</h2>
+        <div style="background:#eee; padding:10px; border-radius:5px;">
+            <h3 id="active-food"></h3>
+            <p id="active-store"></p>
+            <p>السعر: 100 DA</p>
+            <p><i class="fas fa-phone"></i> الزبون: <span id="active-customer-phone">0555...</span></p>
+        </div>
+
+        <div id="map-rider"></div>
+
+        <div class="status-steps" style="margin-top:20px;">
+            <button onclick="updateStatus('heading_to_store')" id="btn-st-1">1. في طريقي للمحل</button>
+            <button onclick="updateStatus('ordered')" id="btn-st-2">2. تم الطلب</button>
             
-            <div class="shipping-policy">
-                <h3>سياسة الشحن</h3>
-                <p>نقوم بالشحن إلى جميع ولايات الجزائر. الشحن مجاني للطلبات فوق 500 دج. التوصيل يتم خلال 2-5 أيام عمل حسب الولاية.</p>
+            <!-- Upload Invoice -->
+            <div style="margin: 10px 0; border:1px dashed #ccc; padding:10px;">
+                <label id="lbl-upload">3. تصوير الفاتورة</label>
+                <input type="file" id="invoice-file" accept="image/*">
+                <button onclick="uploadInvoice()" id="btn-upload" style="background:#4CAF50; margin-top:5px;">إرسال الصورة</button>
+                <img id="invoice-preview" src="">
             </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>حول المتجر</h4>
-                    <ul>
-                        <li><a href="#about">من نحن</a></li>
-                        <li><a href="#contact">اتصل بنا</a></li>
-                        <li><a href="#privacy">سياسة الخصوصية</a></li>
-                        <li><a href="#terms">الشروط والأحكام</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>خدمة العملاء</h4>
-                    <ul>
-                        <li><a href="#shipping">سياسة الشحن</a></li>
-                        <li><a href="#returns">الإرجاع والاستبدال</a></li>
-                        <li><a href="#faq">الأسئلة الشائعة</a></li>
-                        <li><a href="#payment">طرق الدفع</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>الفئات</h4>
-                    <ul id="footerCategories">
-                        <li><a href="#category">ملابس</a></li>
-                        <li><a href="#category">إلكترونيات</a></li>
-                        <li><a href="#category">إكسسوارات</a></li>
-                        <li><a href="#category">منزل</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>تابعنا</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                    <div class="contact-info">
-                        <p><i class="fas fa-phone"></i> 0555 123 456</p>
-                        <p><i class="fas fa-envelope"></i> info@gouba.dz</p>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 متجر جوبا. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Cart Sidebar -->
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <h3>سلة التسوق</h3>
-            <button class="close-cart" id="closeCart">&times;</button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <p class="empty-cart">السلة فارغة</p>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>المجموع:</span>
-                <span id="cartTotal">0 دج</span>
-            </div>
-            <button class="btn-primary btn-block" id="checkoutBtn">إتمام الطلب</button>
+            <button onclick="updateStatus('delivering')" id="btn-st-4">4. تم الاستلام وأنا في الطريق</button>
+            <button onclick="updateStatus('completed')" id="btn-st-5" style="background:#333;">5. تم التوصيل (نهاية)</button>
         </div>
     </div>
 
-    <!-- Product Modal -->
-    <div class="modal" id="productModal">
-        <div class="modal-content product-modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="productModalContent"></div>
-        </div>
-    </div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Firebase SDK (Modular via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getDatabase, ref, push, set, onChildAdded, onValue, update, runTransaction, child, get } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getStorage, ref as sRef, uploadBytes, getDownloadURL } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    <!-- Order Modal -->
-    <div class="modal" id="orderModal">
-        <div class="modal-content order-modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>إتمام الطلب</h2>
-            <form id="orderForm">
-                <div class="form-group">
-                    <label>الاسم الكامل</label>
-                    <input type="text" name="fullName" required>
-                </div>
-                <div class="form-group">
-                    <label>رقم الهاتف</label>
-                    <input type="tel" name="phone" required>
-                </div>
-                <div class="form-group">
-                    <label>العنوان</label>
-                    <textarea name="address" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>الولاية</label>
-                    <input type="text" name="wilaya" required>
-                </div>
-                <div class="form-group">
-                    <label>ملاحظات (اختياري)</label>
-                    <textarea name="notes" rows="2"></textarea>
-                </div>
-                <button type="submit" class="btn-primary btn-block">تأكيد الطلب</button>
-            </form>
-        </div>
-    </div>
+        // Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyACuXD3szL8eudcmU5QtPWRT9Ha8k782DA",
+            authDomain: "gouba-80f4c.firebaseapp.com",
+            projectId: "gouba-80f4c",
+            storageBucket: "gouba-80f4c.appspot.com",
+            messagingSenderId: "640752558914",
+            appId: "1:640752558914:web:75951a854ee68f4b3b1edb",
+            measurementId: "G-Y5T48PJ38Z"
+        };
 
-    <div class="overlay" id="overlay"></div>
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+        
+        // --- Global Variables ---
+        let currentRole = ''; 
+        let currentLang = 'ar';
+        let myOrderId = null;
+        let myRiderId = null; 
+        let riderWatchId = null;
+        let activeOrderData = null;
+        let map = null;
+        let markers = {};
 
-    <script type="module" src="app.js"></script>
+        // --- Translations ---
+        const texts = {
+            ar: {
+                welcome: "Comondi", choose: "اختر هويتك", customer: "أنا زبون", rider: "أنا موصل",
+                newOrder: "طلب جديد", food: "اسم الأكل", store: "اسم المحل", orderBtn: "اطلب الآن",
+                tracking: "تتبع الطلب", waiting: "بانتظار القبول...", accepted: "تم قبول الطلب!",
+                invoice: "فاتورة", login: "دخول الموصلين", avail: "الطلبات المتاحة", 
+                startWork: "ابدأ العمل", mission: "مهمة جارية", 
+                st1: "في طريقي للمحل", st2: "تم الطلب", st3: "إرسال الفاتورة", st4: "في الطريق إليك", st5: "تم التوصيل",
+                completed: "تم التوصيل بنجاح!"
+            },
+            fr: {
+                welcome: "Comondi", choose: "Choisissez votre rôle", customer: "Je suis Client", rider: "Je suis Livreur",
+                newOrder: "Nouvelle Commande", food: "Nom du plat", store: "Nom du magasin", orderBtn: "Commander (GPS)",
+                tracking: "Suivi Commande", waiting: "En attente...", accepted: "Commande acceptée!",
+                invoice: "Facture", login: "Connexion Livreur", avail: "Commandes Disponibles", 
+                startWork: "Commencer", mission: "Mission en cours",
+                st1: "En route vers le magasin", st2: "Commandé", st3: "Envoyer Facture", st4: "En route vers vous", st5: "Livré",
+                completed: "Livraison terminée!"
+            }
+        };
+
+        // --- Shared Functions ---
+        window.setLang = (lang) => {
+            currentLang = lang;
+            document.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update text simply (Partial list for demo)
+            document.getElementById('txt-welcome').innerText = texts[lang].welcome;
+            document.getElementById('txt-choose-role').innerText = texts[lang].choose;
+            document.getElementById('txt-iam-customer').innerText = texts[lang].customer;
+            document.getElementById('txt-iam-rider').innerText = texts[lang].rider;
+            document.getElementById('txt-new-order').innerText = texts[lang].newOrder;
+            document.getElementById('lbl-food').innerText = texts[lang].food;
+            document.getElementById('lbl-store').innerText = texts[lang].store;
+            document.getElementById('btn-order-now').innerText = texts[lang].orderBtn;
+            document.getElementById('txt-tracking').innerText = texts[lang].tracking;
+            // ... add others as needed
+        };
+
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(id).classList.add('active-screen');
+            if(id === 'screen-tracking' || id === 'screen-rider-active') {
+                setTimeout(() => { if(map) map.invalidateSize(); }, 500); // Fix map rendering
+            }
+        };
+
+        // --- Customer Logic ---
+        window.createOrder = () => {
+            const food = document.getElementById('food-name').value;
+            const store = document.getElementById('store-name').value;
+            
+            if(!food || !store) return alert("الرجاء ملء جميع الحقول");
+
+            document.getElementById('btn-order-now').disabled = true;
+            document.getElementById('customer-status').innerText = "جاري تحديد الموقع...";
+            document.getElementById('customer-status').classList.remove('hidden');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    const newOrderRef = push(ref(db, 'orders'));
+                    myOrderId = newOrderRef.key;
+
+                    set(newOrderRef, {
+                        foodName: food,
+                        storeName: store,
+                        customerLat: lat,
+                        customerLng: lng,
+                        customerPhone: "05XXXXXXXX", // In real app, ask for input
+                        status: 'pending',
+                        price: 100,
+                        riderId: null,
+                        timestamp: Date.now()
+                    }).then(() => {
+                        showScreen('screen-tracking');
+                        initCustomerMap(lat, lng);
+                        listenToMyOrder();
+                    });
+
+                }, () => alert("فشل تحديد الموقع. تأكد من تفعيل GPS"));
+            } else {
+                alert("المتصفح لا يدعم GPS");
+            }
+        };
+
+        function listenToMyOrder() {
+            const orderRef = ref(db, 'orders/' + myOrderId);
+            onValue(orderRef, (snapshot) => {
+                const data = snapshot.val();
+                if(!data) return;
+
+                const statusTxt = document.getElementById('order-status-text');
+                
+                // Update text based on status
+                if(data.status === 'pending') statusTxt.innerText = texts[currentLang].waiting;
+                else if (data.status === 'completed') {
+                    statusTxt.innerText = texts[currentLang].completed;
+                    statusTxt.style.color = "green";
+                    alert(texts[currentLang].completed);
+                } else {
+                    statusTxt.innerText = texts[currentLang].accepted + " (" + getStatusText(data.status) + ")";
+                }
+
+                // If Rider accepted
+                if(data.riderId && data.riderLat) {
+                    // Update Map with Rider Icon
+                    updateRiderMarkerOnMap(data.riderLat, data.riderLng);
+                    
+                    // Show Rider Info
+                    document.getElementById('rider-phone-display').classList.remove('hidden');
+                    // In real app retrieve rider phone from users/riderId, here we assume it's stored or just show placeholder
+                    document.getElementById('rider-phone-val').innerText = "Rider Contact"; 
+                }
+
+                // Invoice
+                if(data.invoiceUrl) {
+                    document.getElementById('invoice-area').classList.remove('hidden');
+                    document.getElementById('customer-invoice-view').src = data.invoiceUrl;
+                    document.getElementById('customer-invoice-view').style.display = 'block';
+                }
+            });
+        }
+
+        // --- Rider Logic ---
+        window.riderLogin = () => {
+            const name = document.getElementById('rider-name').value;
+            const phone = document.getElementById('rider-phone').value;
+            if(!name) return;
+            
+            myRiderId = phone; // Simple ID for demo
+            showScreen('screen-rider-dashboard');
+            listenForNewOrders();
+        };
+
+        function listenForNewOrders() {
+            const ordersRef = ref(db, 'orders');
+            document.getElementById('orders-list').innerHTML = ""; // Clear
+
+            onChildAdded(ordersRef, (snapshot) => {
+                const order = snapshot.val();
+                const key = snapshot.key;
+
+                if(order.status === 'pending') {
+                    // Play Sound
+                    document.getElementById('notif-sound').play().catch(e => console.log(e));
+
+                    const div = document.createElement('div');
+                    div.className = 'order-card';
+                    div.id = `order-${key}`;
+                    div.innerHTML = `
+                        <div style="overflow:hidden">
+                            <span class="price-tag">${order.price} DA</span>
+                            <h3 style="margin:0 10px">${order.foodName}</h3>
+                        </div>
+                        <p>${order.storeName}</p>
+                        <button onclick="acceptOrder('${key}')">قبول الطلب</button>
+                    `;
+                    document.getElementById('orders-list').appendChild(div);
+                }
+            });
+
+            // Remove order if taken by someone else
+            onValue(ordersRef, (snapshot) => {
+                snapshot.forEach(childSnap => {
+                    const val = childSnap.val();
+                    const el = document.getElementById(`order-${childSnap.key}`);
+                    if(el && val.status !== 'pending') {
+                        el.remove();
+                    }
+                });
+            });
+        }
+
+        window.acceptOrder = (orderId) => {
+            const orderRef = ref(db, 'orders/' + orderId);
+            
+            runTransaction(orderRef, (currentData) => {
+                if (currentData && currentData.status === 'pending') {
+                    currentData.status = 'accepted';
+                    currentData.riderId = myRiderId;
+                    return currentData;
+                } else {
+                    return; // Abort if already taken
+                }
+            }).then((result) => {
+                if (result.committed) {
+                    activeOrderData = result.snapshot.val();
+                    activeOrderData.key = orderId; // save key
+                    startRiderMission(activeOrderData);
+                } else {
+                    alert("سبقك إليها موصل آخر!");
+                }
+            });
+        };
+
+        function startRiderMission(order) {
+            showScreen('screen-rider-active');
+            document.getElementById('active-food').innerText = order.foodName;
+            document.getElementById('active-store').innerText = order.storeName;
+            document.getElementById('active-customer-phone').innerText = order.customerPhone;
+
+            // Initialize Rider Map
+            initRiderMap(order.customerLat, order.customerLng);
+
+            // Start Tracking Rider GPS
+            if(navigator.geolocation) {
+                riderWatchId = navigator.geolocation.watchPosition((pos) => {
+                    const rLat = pos.coords.latitude;
+                    const rLng = pos.coords.longitude;
+                    
+                    // Update DB
+                    update(ref(db, 'orders/' + order.key), {
+                        riderLat: rLat,
+                        riderLng: rLng
+                    });
+
+                    // Update Map
+                    updateRiderMarkerOnMap(rLat, rLng, true); // True = centered on rider
+
+                    // Check Proximity (Auto Finish)
+                    const dist = getDistanceFromLatLonInKm(rLat, rLng, order.customerLat, order.customerLng);
+                    if(dist < 0.05 && order.status === 'delivering') { // Less than 50 meters
+                         updateStatus('completed');
+                         alert("وصلت للزبون!");
+                    }
+
+                }, null, { enableHighAccuracy: true });
+            }
+        }
+
+        window.updateStatus = (newStatus) => {
+            if(!activeOrderData) return;
+            update(ref(db, 'orders/' + activeOrderData.key), {
+                status: newStatus
+            });
+            // Visual feedback
+            const btnMap = {
+                'heading_to_store': 'btn-st-1',
+                'ordered': 'btn-st-2',
+                'delivering': 'btn-st-4',
+                'completed': 'btn-st-5'
+            };
+            if(btnMap[newStatus]) {
+                document.getElementById(btnMap[newStatus]).classList.add('done');
+            }
+            if(newStatus === 'completed') {
+                 navigator.geolocation.clearWatch(riderWatchId);
+                 setTimeout(() => { showScreen('screen-rider-dashboard'); }, 3000);
+            }
+        };
+
+        window.uploadInvoice = () => {
+            const file = document.getElementById('invoice-file').files[0];
+            if(!file || !activeOrderData) return;
+
+            const storageRef = sRef(storage, 'invoices/' + activeOrderData.key + '_' + Date.now());
+            
+            uploadBytes(storageRef, file).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((url) => {
+                    // Save URL to Order in DB
+                    update(ref(db, 'orders/' + activeOrderData.key), {
+                        invoiceUrl: url
+                    });
+                    document.getElementById('invoice-preview').src = url;
+                    alert("تم إرسال الفاتورة");
+                });
+            }).catch(err => alert("خطأ في الرفع: " + err.message));
+        };
+
+        // --- Map Utilities ---
+        
+        // Icons
+        const customerIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/236/236831.png', // Anime person-ish
+            iconSize: [40, 40]
+        });
+        const bikeIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/171/171250.png', // Motorbike
+            iconSize: [40, 40]
+        });
+
+        function initCustomerMap(lat, lng) {
+            if(map) map.remove();
+            map = L.map('map-customer').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            
+            // Customer Marker
+            L.marker([lat, lng], {icon: customerIcon}).addTo(map).bindPopup("أنا (الزبون)");
+        }
+
+        function initRiderMap(custLat, custLng) {
+            if(map) map.remove();
+            map = L.map('map-rider').setView([custLat, custLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            // Customer Marker
+            L.marker([custLat, custLng], {icon: customerIcon}).addTo(map).bindPopup("الزبون");
+        }
+
+        function updateRiderMarkerOnMap(lat, lng, center = false) {
+            if(!map) return;
+            
+            if(markers['rider']) {
+                markers['rider'].setLatLng([lat, lng]);
+            } else {
+                markers['rider'] = L.marker([lat, lng], {icon: bikeIcon}).addTo(map).bindPopup("الموصل");
+            }
+
+            if(center) map.setView([lat, lng], 16);
+        }
+
+        function getStatusText(st) {
+            const d = {
+                'pending': 'جاري البحث', 'accepted': 'تم القبول',
+                'heading_to_store': 'في الطريق للمحل', 'ordered': 'تم طلب الأكل',
+                'delivering': 'جاي في الطريق', 'completed': 'وصلت'
+            };
+            return d[st] || st;
+        }
+
+        function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2-lat1);  
+            var dLon = deg2rad(lon2-lon1); 
+            var a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            var d = R * c; 
+            return d;
+        }
+        function deg2rad(deg) { return deg * (Math.PI/180); }
+
+    </script>
 </body>
 </html>
