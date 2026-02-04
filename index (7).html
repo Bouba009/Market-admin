@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comondi - توصيل الطعام | Livraison de Nourriture</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('ar')" class="lang-btn active" id="ar-btn">العربية</button>
+        <button onclick="switchLanguage('fr')" class="lang-btn" id="fr-btn">Français</button>
+    </div>
+
+    <!-- Login/Registration Screen -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <div class="logo">
+                <h1>Comondi</h1>
+                <p class="tagline" data-ar="ربط موصلي الطعام مع الزبائن" data-fr="Connecter les livreurs avec les clients">ربط موصلي الطعام مع الزبائن</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="showAuthTab('customer')" data-ar="زبون" data-fr="Client">زبون</button>
+                <button class="tab-btn" onclick="showAuthTab('driver')" data-ar="موصل طعام" data-fr="Livreur">موصل طعام</button>
+            </div>
+
+            <div class="auth-form">
+                <input type="text" id="username" placeholder="الاسم / Nom" data-ar-placeholder="الاسم" data-fr-placeholder="Nom">
+                <input type="tel" id="phone" placeholder="رقم الهاتف / Téléphone" data-ar-placeholder="رقم الهاتف" data-fr-placeholder="Téléphone">
+                <button onclick="login()" class="primary-btn" data-ar="تسجيل الدخول" data-fr="Se connecter">تسجيل الدخول</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Screen -->
+    <div id="customer-screen" class="screen">
+        <div class="header">
+            <h2 data-ar="طلب جديد" data-fr="Nouvelle commande">طلب جديد</h2>
+            <button onclick="logout()" class="logout-btn" data-ar="خروج" data-fr="Déconnexion">خروج</button>
+        </div>
+
+        <div class="order-form">
+            <div class="form-group">
+                <label data-ar="اسم الأكل:" data-fr="Nom du plat:">اسم الأكل:</label>
+                <input type="text" id="food-name" placeholder="Sandwich, Tacos..." data-ar-placeholder="ساندويتش، تاكوس..." data-fr-placeholder="Sandwich, Tacos...">
+            </div>
+
+            <div class="form-group">
+                <label data-ar="اسم المحل:" data-fr="Nom du restaurant:">اسم المحل:</label>
+                <input type="text" id="restaurant-name" placeholder="ADM Food" data-ar-placeholder="مثال: ADM Food" data-fr-placeholder="Ex: ADM Food">
+            </div>
+
+            <div class="form-group">
+                <label data-ar="ملاحظات إضافية:" data-fr="Notes supplémentaires:">ملاحظات إضافية:</label>
+                <textarea id="notes" rows="3" placeholder="" data-ar-placeholder="أي تفاصيل إضافية..." data-fr-placeholder="Détails supplémentaires..."></textarea>
+            </div>
+
+            <button onclick="shareLocation()" class="primary-btn location-btn">
+                <span data-ar="📍 مشاركة الموقع وإرسال الطلب" data-fr="📍 Partager la localisation et envoyer">📍 مشاركة الموقع وإرسال الطلب</span>
+            </button>
+        </div>
+
+        <!-- Order Status -->
+        <div id="customer-status" class="status-container" style="display: none;">
+            <h3 data-ar="حالة الطلب" data-fr="État de la commande">حالة الطلب</h3>
+            <div class="status-text" id="status-text"></div>
+            
+            <div id="map-container" class="map-container">
+                <div id="customer-map" class="map"></div>
+            </div>
+
+            <div id="invoice-container" style="display: none;">
+                <h4 data-ar="فاتورة المنتجات" data-fr="Facture des produits">فاتورة المنتجات</h4>
+                <img id="invoice-image" src="" alt="Invoice" class="invoice-image">
+            </div>
+
+            <div class="driver-info" id="driver-info" style="display: none;">
+                <p><strong data-ar="رقم هاتف الموصل:" data-fr="Téléphone du livreur:">رقم هاتف الموصل:</strong> <span id="driver-phone"></span></p>
+            </div>
+
+            <div id="success-message" class="success-message" style="display: none;">
+                <div class="success-icon">✓</div>
+                <h3 data-ar="تم التوصيل بنجاح!" data-fr="Livraison réussie!">تم التوصيل بنجاح!</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver Screen -->
+    <div id="driver-screen" class="screen">
+        <div class="header">
+            <h2 data-ar="الطلبات المتاحة" data-fr="Commandes disponibles">الطلبات المتاحة</h2>
+            <button onclick="logout()" class="logout-btn" data-ar="خروج" data-fr="Déconnexion">خروج</button>
+        </div>
+
+        <div id="available-orders" class="orders-list"></div>
+
+        <!-- Active Order Management -->
+        <div id="active-order" class="active-order-container" style="display: none;">
+            <h3 data-ar="الطلب النشط" data-fr="Commande active">الطلب النشط</h3>
+            
+            <div class="order-details" id="order-details"></div>
+
+            <div id="driver-map-container" class="map-container">
+                <div id="driver-map" class="map"></div>
+            </div>
+
+            <div class="status-buttons">
+                <button onclick="updateStatus('going-to-restaurant')" class="status-btn" data-ar="🏪 في طريقي إلى المحل" data-fr="🏪 En route vers le restaurant">🏪 في طريقي إلى المحل</button>
+                <button onclick="updateStatus('at-restaurant')" class="status-btn" data-ar="📦 تم طلب احتياجكم" data-fr="📦 Commande récupérée">📦 تم طلب احتياجكم</button>
+                <button onclick="uploadInvoice()" class="status-btn" data-ar="📸 تصوير الفاتورة" data-fr="📸 Prendre photo facture">📸 تصوير الفاتورة</button>
+                <button onclick="updateStatus('on-the-way')" class="status-btn" data-ar="🏍️ في الطريق إليك" data-fr="🏍️ En route vers vous">🏍️ في الطريق إليك</button>
+                <button onclick="completeDelivery()" class="status-btn complete-btn" data-ar="✓ تم التوصيل" data-fr="✓ Livraison terminée">✓ تم التوصيل</button>
+            </div>
+
+            <input type="file" id="invoice-upload" accept="image/*" style="display: none;" onchange="handleInvoiceUpload(event)">
+        </div>
+    </div>
+
+    <!-- Audio for notifications -->
+    <audio id="notification-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUKXh8LJnGwU7k9n0yHkpBCR2xe/bjz8JE12y5+qnUxIKRp/g8r5sIAUrlc7y2Ik3CBtpvPDim0wMDlCl4fCyZxsFO5PY9Mh5KQQkdsXv2488CRNdsubnp1MSCkaf4PK+bCAFK5bO8tiJNwgbabzw45tMDA5QpeHwsmcbBTuT2PTIeSkEJHbF79uPPAkTXbLm56dUEgpGn+DyvmwgBSuWzvLYiTcIG2m88OObTAwOUKXh8LJnGwU7k9j0yHkpBCR2xe/bjzwJE12y5uenVBIKRp/g8r5sIAUrlc7y2Ik3CBxpu/DnnU0MDlCl4fCyZxsFO5PY9Mh5KQQkdsXv2488CRNdsubnp1QSCkaf4PK+bCAFK5XO8tiJNwgcabvw551NDA5QpeHwsmcbBTuT2PTIeSkEJHbF79uPPAkTXbLm56dUEgpGn+DyvmwgBSuVzvLYiTcIHGm78OedTQwOUKXh8LJnGwU7k9j0yHkpBCR2xe/bjzwJE12y5uenVBIKRp/g8r5sIAUrlc7y2Ik3CBxpu/DnnU0MDlCl4fCyZxsFO5PY9Mh5KQQkdsXv2488CRNdsubnp1QSCkaf4PK+bCAFK5XO8tiJNwgcabvw551NDA5QpeHwsmcbBTuT2PTIeSkEJHbF79uPPAkTXbLm56dUEgpGn+DyvmwgBSuVzvLYiTcIHGm78OedTQwOUKXh8LJnGwU7k9j0yHkpBCR2xe/bjzwJE12y5uenVBIKRp/g8r5sIAUrlc7y2Ik3CBxpu/DnnU0MDlCl4fCyZxsFO5PY9Mh5KQQkdsXv2488CRNdsubnp1QSCkaf4PK+bCAFK5XO8tiJNwgcabvw551NDA5QpeHwsmcbBTuT2PTIeSkEJHbF79uPPAkTXbLm56dUEgpGn+DyvmwgBSuVzvLYiTcIHGm78OedTQwOUKXh8LJnGwU7k9j0yHkpBCR2xe/bjzwJE12y5uenVBIKRp/g8r5sIAUrlc7y2Ik3CBxpu/DnnU0MDlCl4fCyZxsFO5PY9Mh5KQQkdsXv2488CRNdsubnp1QSCkaf4PK+bCAFK5XO8tiJNwgcabvw551NDA5QpeHwsmcbBTuT2PTIeSkEJHbF79uPPAkTXbLm56dUEgo=" type="audio/wav">
+    </audio>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
