@@ -3,109 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comondi - توصيل الطعام</title>
+    <title>Comondi - توصيل الطلبات</title>
     
-    <!-- CSS Leaflet Map -->
+    <!-- مكتبة الخرائط Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- FontAwesome Icons -->
+    <!-- مكتبة الأيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #FF5722;
-            --secondary: #2196F3;
-            --bg: #f8f9fa;
+            --primary: #FF5722; /* لون برتقالي رئيسي */
+            --secondary: #2196F3; /* لون أزرق ثانوي */
+            --bg: #f4f6f8;
             --text: #333;
             --card-bg: #ffffff;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
         
-        /* Language Toggle */
+        /* زر تغيير اللغة */
         .lang-switch { position: absolute; top: 15px; left: 15px; z-index: 2000; }
-        .lang-btn { background: #fff; border: 1px solid #ccc; padding: 5px 12px; cursor: pointer; border-radius: 20px; font-weight: bold; }
+        .lang-btn { background: #fff; border: 1px solid #ccc; padding: 5px 12px; cursor: pointer; border-radius: 20px; font-weight: bold; font-size: 12px; }
         .lang-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* Screens */
+        /* الشاشات */
         .screen { display: none; padding: 20px; max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--card-bg); box-shadow: 0 0 15px rgba(0,0,0,0.05); }
-        .active-screen { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .active-screen { display: block; animation: fadeIn 0.4s ease-in-out; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 15px; }
         
-        /* Forms */
+        /* النماذج والأزرار */
         .form-group { margin-bottom: 15px; }
-        label { font-weight: bold; font-size: 0.9em; color: #666; display: block; margin-bottom: 5px; }
-        input, select, button { width: 100%; padding: 14px; margin-top: 5px; box-sizing: border-box; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; }
-        input:focus { outline: none; border-color: var(--primary); }
+        label { font-weight: bold; font-size: 0.9em; color: #555; display: block; margin-bottom: 5px; }
+        input, select, button { width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 5px rgba(255, 87, 34, 0.2); }
         
-        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
-        button:hover { background: #E64A19; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 15px; }
+        button:hover { background: #E64A19; }
         button.secondary { background: #fff; color: #555; border: 1px solid #ddd; }
         button.secondary:hover { background: #f0f0f0; }
 
-        /* Auth Links */
-        .auth-link { text-align: center; margin-top: 15px; font-size: 0.9em; }
+        /* روابط الدخول والتسجيل */
+        .auth-link { text-align: center; margin-top: 20px; font-size: 0.9em; }
         .auth-link span { color: var(--secondary); cursor: pointer; text-decoration: underline; }
 
-        /* Dashboard Grid (Rider) */
+        /* لوحة تحكم الموصل (Dashboard Grid) */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 Columns */
-            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 20px;
         }
         .stat-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px; text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
-        .stat-card i { font-size: 24px; color: var(--secondary); margin-bottom: 10px; }
-        .stat-card h4 { margin: 5px 0; font-size: 20px; color: #333; }
-        .stat-card p { margin: 0; font-size: 12px; color: #888; }
+        .stat-card i { font-size: 24px; margin-bottom: 8px; }
+        .stat-card h4 { margin: 5px 0; font-size: 18px; color: #333; }
+        .stat-card p { margin: 0; font-size: 11px; color: #888; }
 
-        /* Map */
-        #map-customer, #map-rider { height: 350px; width: 100%; border-radius: 12px; margin-top: 15px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        /* الخريطة */
+        #map-customer, #map-rider { height: 300px; width: 100%; border-radius: 12px; margin-top: 15px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         
-        /* Order Card */
-        .order-card { background: #fff; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .price-badge { background: #4CAF50; color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; float: left; }
+        /* بطاقة الطلب */
+        .order-card { background: #fff; border-right: 4px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: slideIn 0.3s; }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .price-badge { background: #4CAF50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; float: left; }
 
-        /* Status Steps */
-        .status-steps button { margin-bottom: 8px; background: #e0e0e0; color: #333; text-align: right; padding-right: 20px; }
-        .status-steps button.active-step { background: var(--secondary); color: white; }
-        .status-steps button.done { background: #81C784; color: white; cursor: default; }
+        /* أزرار الحالة */
+        .status-steps button { margin-bottom: 8px; background: #f5f5f5; color: #333; text-align: right; padding-right: 15px; border: 1px solid #eee; }
+        .status-steps button.active-step { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .status-steps button.done { background: #81C784; color: white; cursor: default; border-color: #81C784; }
 
-        /* Invoice */
+        /* الفاتورة ورسائل الخطأ */
         #invoice-preview, #customer-invoice-view { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; display: none; }
+        .error-msg { color: #d32f2f; font-size: 0.85em; text-align: center; display: none; margin-top: 8px; background: #ffebee; padding: 5px; border-radius: 4px; }
         
-        .error-msg { color: red; font-size: 0.85em; text-align: center; display: none; margin-top: 5px; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 25px; height: 25px; animation: spin 1s linear infinite; margin: 10px auto; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Language Switcher -->
+    <!-- تبديل اللغة -->
     <div class="lang-switch">
         <button class="lang-btn active" onclick="setLang('ar')">AR</button>
         <button class="lang-btn" onclick="setLang('fr')">FR</button>
     </div>
 
+    <!-- صوت الإشعار -->
     <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
-    <!-- 1. Authentication Screens -->
-    
-    <!-- Login -->
+    <!-- 1. شاشة تسجيل الدخول -->
     <div id="screen-login" class="screen active-screen">
+        <br><br>
         <h1>Comondi</h1>
         <h3 id="txt-login-title">تسجيل الدخول</h3>
+        
         <input type="email" id="login-email" placeholder="البريد الإلكتروني (Email)">
         <input type="password" id="login-pass" placeholder="كلمة المرور (Password)">
+        
         <p id="login-error" class="error-msg"></p>
         <button onclick="handleLogin()" id="btn-login">دخول</button>
         
@@ -114,8 +113,9 @@
         </div>
     </div>
 
-    <!-- Register -->
+    <!-- 2. شاشة إنشاء حساب (مع حل مشكلة التكرار) -->
     <div id="screen-register" class="screen">
+        <br>
         <h1>Comondi</h1>
         <h3 id="txt-reg-title">إنشاء حساب جديد</h3>
         
@@ -140,12 +140,13 @@
         </div>
     </div>
 
-    <!-- 2. Customer: Create Order -->
+    <!-- 3. شاشة الزبون: طلب جديد -->
     <div id="screen-customer" class="screen">
-        <div style="display:flex; justify-content:space-between;">
-            <button onclick="logout()" class="secondary" style="width:auto; padding:5px 10px;">خروج</button>
-            <h2 id="txt-welcome-cust">أهلاً بك</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 id="txt-welcome-cust" style="margin:0; font-size:1.2em;">أهلاً</h2>
+            <button onclick="logout()" class="secondary" style="width:auto; margin:0; padding:5px 12px; font-size:0.8em;">خروج</button>
         </div>
+        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
         
         <h3 id="txt-new-order">طلب جديد</h3>
         
@@ -155,8 +156,8 @@
         </div>
         
         <div class="form-group">
-            <label id="lbl-drink">اسم المشروب (اختياري)</label>
-            <input type="text" id="drink-name" placeholder="مثال: Coca Cola, Jus...">
+            <label id="lbl-drink">المشروب (اختياري)</label>
+            <input type="text" id="drink-name" placeholder="مثال: Coca Cola...">
         </div>
 
         <div class="form-group">
@@ -169,38 +170,39 @@
         <p id="gps-error" class="error-msg"></p>
     </div>
 
-    <!-- 3. Customer: Tracking -->
+    <!-- 4. شاشة الزبون: تتبع الطلب -->
     <div id="screen-tracking" class="screen">
         <h2 id="txt-tracking">تتبع طلبك</h2>
-        <div style="text-align:center; padding:10px; background:#e3f2fd; border-radius:8px;">
-            <p style="margin:0; font-weight:bold; color:var(--secondary);" id="order-status-text">بانتظار القبول...</p>
+        
+        <div style="text-align:center; padding:15px; background:#e3f2fd; border-radius:8px; border:1px solid #bbdefb;">
+            <p style="margin:0; font-weight:bold; color:var(--secondary); font-size:1.1em;" id="order-status-text">بانتظار القبول...</p>
         </div>
         
-        <div id="rider-info-box" class="hidden" style="margin-top:10px; padding:10px; background:#fff3e0; border-radius:8px;">
+        <div id="rider-info-box" class="hidden" style="margin-top:10px; padding:10px; background:#fff3e0; border-radius:8px; display:none;">
             <p style="margin:5px 0"><i class="fas fa-motorcycle"></i> <strong>الموصل:</strong> <span id="rider-name-display">...</span></p>
             <p style="margin:5px 0"><i class="fas fa-phone"></i> <span id="rider-phone-display">...</span></p>
         </div>
 
         <div id="map-customer"></div>
         
-        <div id="invoice-area" class="hidden">
-            <h3 id="txt-invoice">فاتورة المشتريات</h3>
+        <div id="invoice-area" class="hidden" style="display:none;">
+            <h3 id="txt-invoice" style="margin-top:20px;">فاتورة المشتريات</h3>
             <img id="customer-invoice-view" src="" alt="Invoice">
         </div>
     </div>
 
-    <!-- 4. Rider: Dashboard -->
+    <!-- 5. شاشة الموصل: لوحة التحكم -->
     <div id="screen-rider-dashboard" class="screen">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h2 style="margin:0;" id="txt-dash">لوحة التحكم</h2>
-            <button onclick="logout()" class="secondary" style="width:auto; margin:0; padding:5px 10px;"><i class="fas fa-sign-out-alt"></i></button>
+            <button onclick="logout()" class="secondary" style="width:auto; margin:0; padding:5px 12px;"><i class="fas fa-sign-out-alt"></i></button>
         </div>
-        <p style="text-align:center; color:#777;" id="rider-welcome-name">مرحباً</p>
+        <p style="text-align:center; color:#777; font-size:0.9em; margin-bottom:15px;" id="rider-welcome-name">...</p>
 
-        <!-- 2x2 Stats Grid -->
+        <!-- احصائيات 2x2 -->
         <div class="dashboard-grid">
             <div class="stat-card">
-                <i class="fas fa-check-circle"></i>
+                <i class="fas fa-check-circle" style="color:var(--secondary);"></i>
                 <h4 id="stat-completed">0</h4>
                 <p id="txt-stat-comp">طلبات مكتملة</p>
             </div>
@@ -215,19 +217,19 @@
                 <p id="txt-stat-rate">التقييم</p>
             </div>
             <div class="stat-card">
-                <i class="fas fa-signal" style="color:var(--primary);"></i>
-                <h4 id="txt-online">متصل</h4>
+                <i class="fas fa-wifi" style="color:var(--primary);"></i>
+                <h4 id="txt-online" style="font-size:16px; margin-top:8px;">متصل</h4>
                 <p id="txt-stat-st">الحالة</p>
             </div>
         </div>
 
-        <h3 style="text-align:right;" id="txt-avail-orders">الطلبات الواردة</h3>
+        <h3 style="text-align:right; font-size:1.1em; border-bottom:2px solid #eee; padding-bottom:5px;" id="txt-avail-orders">الطلبات الواردة</h3>
         <div id="orders-list">
-            <p style="text-align:center; color:#999; margin-top:20px;" id="txt-no-orders">لا توجد طلبات حالياً...</p>
+            <p style="text-align:center; color:#999; margin-top:30px;" id="txt-no-orders">لا توجد طلبات حالياً...</p>
         </div>
     </div>
 
-    <!-- 5. Rider: Active Mission -->
+    <!-- 6. شاشة الموصل: المهمة الجارية -->
     <div id="screen-rider-active" class="screen">
         <h3 id="txt-mission">المهمة الحالية</h3>
         
@@ -237,10 +239,11 @@
                 <span style="background:var(--secondary); color:#fff; padding:2px 8px; border-radius:4px;">100 DA</span>
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
-            <p><strong><i class="fas fa-hamburger"></i>:</strong> <span id="active-food"></span></p>
-            <p><strong><i class="fas fa-wine-bottle"></i>:</strong> <span id="active-drink">--</span></p>
-            <p><strong><i class="fas fa-user"></i>:</strong> <span id="active-cust-name">...</span></p>
-            <a id="btn-call-cust" href="#" style="display:block; text-align:center; background:#4CAF50; color:white; padding:8px; text-decoration:none; border-radius:5px; margin-top:5px;">
+            <p style="margin:5px 0;"><strong><i class="fas fa-hamburger"></i>:</strong> <span id="active-food"></span></p>
+            <p style="margin:5px 0;"><strong><i class="fas fa-wine-bottle"></i>:</strong> <span id="active-drink">--</span></p>
+            <p style="margin:5px 0;"><strong><i class="fas fa-user"></i>:</strong> <span id="active-cust-name">...</span></p>
+            
+            <a id="btn-call-cust" href="#" style="display:block; text-align:center; background:#4CAF50; color:white; padding:10px; text-decoration:none; border-radius:5px; margin-top:10px; font-weight:bold;">
                 <i class="fas fa-phone"></i> اتصال بالزبون
             </a>
         </div>
@@ -248,15 +251,16 @@
         <div id="map-rider"></div>
 
         <div class="status-steps" style="margin-top:20px;">
-            <p style="font-size:0.9em; color:#666; margin-bottom:5px;">تحديث الحالة:</p>
+            <p style="font-size:0.9em; color:#666; margin-bottom:5px;">تحديث حالة الطلب:</p>
+            
             <button onclick="updateStatus('heading_to_store')" id="btn-st-1">1. أنا في الطريق للمحل</button>
             <button onclick="updateStatus('ordered')" id="btn-st-2">2. تم شراء الطلب</button>
             
-            <!-- Upload Invoice -->
-            <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:8px; border:1px dashed #ccc;">
-                <label style="font-size:0.8em;">3. تصوير الفاتورة (إجباري)</label>
-                <input type="file" id="invoice-file" accept="image/*" style="font-size:0.8em;">
-                <button onclick="uploadInvoice()" id="btn-upload" class="secondary" style="margin-top:5px; width:auto; font-size:0.8em;">رفع الصورة</button>
+            <!-- رفع الفاتورة -->
+            <div style="background:#fff; padding:10px; border-radius:8px; margin-bottom:8px; border:1px dashed #ccc;">
+                <label style="font-size:0.85em; margin-bottom:5px;">3. تصوير الفاتورة (لإظهارها للزبون)</label>
+                <input type="file" id="invoice-file" accept="image/*" style="font-size:0.8em; padding:5px;">
+                <button onclick="uploadInvoice()" id="btn-upload" class="secondary" style="margin-top:5px; width:auto; font-size:0.85em;">رفع الصورة</button>
                 <img id="invoice-preview" src="">
             </div>
 
@@ -265,10 +269,9 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- كود الجافاسكريبت والفايربيس -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Firebase SDK Modular -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, set, onChildAdded, onValue, update, runTransaction, get, query, orderByChild, equalTo } 
@@ -278,9 +281,9 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- Firebase Config ---
+        // إعدادات فايربيس الخاصة بك
         const firebaseConfig = {
-            apiKey: "AIzaSyACuXD3szL8eudcmU5QtPWRT9Ha8k782DA", // تأكد من صحة المفتاح
+            apiKey: "AIzaSyACuXD3szL8eudcmU5QtPWRT9Ha8k782DA",
             authDomain: "gouba-80f4c.firebaseapp.com",
             projectId: "gouba-80f4c",
             storageBucket: "gouba-80f4c.appspot.com",
@@ -288,12 +291,13 @@
             appId: "1:640752558914:web:75951a854ee68f4b3b1edb"
         };
 
+        // تهيئة فايربيس
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const storage = getStorage(app);
         const auth = getAuth(app);
         
-        // --- Global State ---
+        // متغيرات عامة
         let currentUser = null;
         let userData = null;
         let currentLang = 'ar';
@@ -302,7 +306,7 @@
         let activeOrderData = null;
         let map = null, markers = {};
         
-        // --- Translations ---
+        // نصوص الترجمة
         const texts = {
             ar: {
                 loginTitle: "تسجيل الدخول", regTitle: "إنشاء حساب جديد",
@@ -328,7 +332,9 @@
             }
         };
 
-        // --- Auth Logic ---
+        // --- دوال المصادقة (Auth) ---
+        
+        // دالة إنشاء الحساب (المحسنة مع معالجة الأخطاء)
         window.handleRegister = () => {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
@@ -336,38 +342,68 @@
             const phone = document.getElementById('reg-phone').value;
             const role = document.getElementById('reg-role').value;
             const errBox = document.getElementById('reg-error');
+            const btn = document.getElementById('btn-register');
 
             if(!email || !pass || !name || !phone) {
                 errBox.innerText = "يرجى ملء جميع الحقول"; errBox.style.display='block'; return;
             }
 
+            btn.disabled = true;
+            btn.innerText = "جاري التسجيل...";
+
             createUserWithEmailAndPassword(auth, email, pass)
             .then((userCredential) => {
                 const uid = userCredential.user.uid;
-                // Save user details in DB
+                // حفظ بيانات المستخدم في قاعدة البيانات
                 set(ref(db, 'users/' + uid), {
                     name: name,
                     phone: phone,
                     role: role,
                     email: email
                 }).then(() => {
-                    // Auth state change will handle navigation
+                    // الانتقال التلقائي سيحدث عبر مراقب الحالة
                 });
             })
             .catch((error) => {
-                errBox.innerText = error.message;
+                btn.disabled = false;
+                btn.innerText = "تسجيل";
+                
+                let msg = "حدث خطأ غير معروف";
+                // ترجمة الأخطاء
+                if (error.code === 'auth/email-already-in-use') {
+                    msg = "هذا البريد الإلكتروني مسجل بالفعل! حاول تسجيل الدخول.";
+                } else if (error.code === 'auth/weak-password') {
+                    msg = "كلمة المرور ضعيفة (يجب أن تكون 6 خانات على الأقل).";
+                } else if (error.code === 'auth/invalid-email') {
+                    msg = "صيغة البريد الإلكتروني غير صحيحة.";
+                } else if (error.code === 'auth/network-request-failed') {
+                    msg = "تأكد من اتصالك بالإنترنت.";
+                }
+
+                errBox.innerText = msg;
                 errBox.style.display='block';
             });
         };
 
+        // دالة تسجيل الدخول
         window.handleLogin = () => {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             const errBox = document.getElementById('login-error');
+            const btn = document.getElementById('btn-login');
+
+            if(!email || !pass) { errBox.innerText = "أدخل البريد وكلمة المرور"; errBox.style.display='block'; return; }
+
+            btn.disabled = true; 
+            btn.innerText = "جاري الدخول...";
 
             signInWithEmailAndPassword(auth, email, pass)
             .catch((error) => {
-                errBox.innerText = "خطأ في البريد أو كلمة المرور";
+                btn.disabled = false;
+                btn.innerText = "دخول";
+                let msg = "خطأ في البريد أو كلمة المرور";
+                if(error.code === 'auth/network-request-failed') msg = "تأكد من الانترنت";
+                errBox.innerText = msg;
                 errBox.style.display='block';
             });
         };
@@ -376,11 +412,10 @@
             signOut(auth).then(() => window.location.reload());
         };
 
-        // Listen for auth state
+        // مراقب حالة الدخول (يوجه المستخدم للشاشة المناسبة)
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                // Fetch User Role
                 get(ref(db, 'users/' + user.uid)).then((snapshot) => {
                     if (snapshot.exists()) {
                         userData = snapshot.val();
@@ -392,6 +427,9 @@
                             document.getElementById('rider-welcome-name').innerText = userData.name;
                             initRiderDashboard();
                         }
+                    } else {
+                         // في حال تم حذف المستخدم من قاعدة البيانات وبقي في Auth
+                        showScreen('screen-login');
                     }
                 });
             } else {
@@ -399,7 +437,7 @@
             }
         });
 
-        // --- Customer Logic ---
+        // --- منطق الزبون (Customer) ---
         window.createOrder = () => {
             const food = document.getElementById('food-name').value;
             const drink = document.getElementById('drink-name').value;
@@ -421,8 +459,8 @@
                 return;
             }
 
+            // طلب الموقع
             navigator.geolocation.getCurrentPosition((position) => {
-                // Success
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
 
@@ -439,34 +477,32 @@
                     customerLat: lat,
                     customerLng: lng,
                     status: 'pending',
-                    price: 100, // Fixed price as requested
+                    price: 100,
                     timestamp: Date.now()
                 }).then(() => {
                     loader.style.display = 'none';
                     showScreen('screen-tracking');
-                    initMap('map-customer', lat, lng, false); // false = not rider mode
+                    initMap('map-customer', lat, lng, false);
                     listenToMyOrder();
                 });
 
             }, (error) => {
-                // Error handling
                 let msg = "فشل تحديد الموقع.";
                 if(error.code === 1) msg = "يجب السماح للموقع من إعدادات المتصفح.";
-                else if(error.code === 2) msg = "الGPS غير متاح، تأكد من تشغيله.";
-                else if(window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-                    msg = "يجب تشغيل الموقع على رابط HTTPS ليعمل الـ GPS.";
+                else if(error.code === 2) msg = "تأكد من تشغيل GPS.";
+                // رسالة خاصة بمشكلة HTTP
+                if(window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                    msg += " (ملاحظة: GPS لا يعمل إلا على HTTPS)";
                 }
                 handleLocationError(msg);
-            }, { enableHighAccuracy: true, timeout: 10000 });
+            }, { enableHighAccuracy: true });
         };
 
         function handleLocationError(msg) {
-            const loader = document.getElementById('gps-loader');
-            const errBox = document.getElementById('gps-error');
-            loader.style.display = 'none';
+            document.getElementById('gps-loader').style.display = 'none';
             document.getElementById('btn-order-now').disabled = false;
-            errBox.innerText = msg;
-            errBox.style.display = 'block';
+            document.getElementById('gps-error').innerText = msg;
+            document.getElementById('gps-error').style.display = 'block';
             alert(msg);
         }
 
@@ -478,17 +514,16 @@
 
                 const statusTxt = document.getElementById('order-status-text');
                 
-                // Translate Status
                 let stDisp = data.status;
                 if(stDisp === 'pending') stDisp = texts[currentLang].waiting;
                 else if(stDisp === 'completed') {
-                    stDisp = "تم التوصيل بنجاح شكراً لك!";
-                    alert("وصل طلبك!");
+                    stDisp = "تم التوصيل بنجاح!";
+                    alert("وصل طلبك! شكراً لاستخدام Comondi");
                 } else {
                     stDisp = texts[currentLang].accepted;
-                    // Rider Info
+                    // عرض بيانات الموصل
                     if(data.riderName) {
-                        document.getElementById('rider-info-box').classList.remove('hidden');
+                        document.getElementById('rider-info-box').style.display = 'block';
                         document.getElementById('rider-name-display').innerText = data.riderName;
                         document.getElementById('rider-phone-display').innerText = data.riderPhone;
                     }
@@ -498,81 +533,68 @@
                 }
                 statusTxt.innerText = stDisp;
 
-                // Invoice
+                // عرض الفاتورة
                 if(data.invoiceUrl) {
-                    document.getElementById('invoice-area').classList.remove('hidden');
+                    document.getElementById('invoice-area').style.display = 'block';
                     document.getElementById('customer-invoice-view').src = data.invoiceUrl;
                     document.getElementById('customer-invoice-view').style.display = 'block';
                 }
             });
         }
 
-        // --- Rider Logic ---
+        // --- منطق الموصل (Rider) ---
         function initRiderDashboard() {
-            // 1. Calculate Stats (Orders completed by me)
+            // حساب الإحصائيات
             const ordersQuery = query(ref(db, 'orders'), orderByChild('riderId'), equalTo(currentUser.uid));
-            
             onValue(ordersQuery, (snapshot) => {
                 let completedCount = 0;
                 snapshot.forEach(child => {
                     if(child.val().status === 'completed') completedCount++;
                 });
-                
                 document.getElementById('stat-completed').innerText = completedCount;
                 document.getElementById('stat-earnings').innerText = (completedCount * 100) + " DA";
             });
 
-            // 2. Listen for NEW pending orders
+            // الاستماع للطلبات الجديدة
             const allOrdersRef = ref(db, 'orders');
-            onChildAdded(allOrdersRef, (snapshot) => {
-                const order = snapshot.val();
-                if(order.status === 'pending') {
-                    addOrderToDashboard(snapshot.key, order);
-                }
-            });
-
-            // Monitor removed/taken orders
             onValue(allOrdersRef, (snap) => {
-                document.getElementById('orders-list').innerHTML = ""; // Refresh list
-                let count = 0;
+                const list = document.getElementById('orders-list');
+                list.innerHTML = ""; 
+                let hasOrders = false;
+
                 snap.forEach(child => {
                     const o = child.val();
+                    const key = child.key;
                     if(o.status === 'pending') {
-                        addOrderToDashboard(child.key, o);
-                        count++;
+                        hasOrders = true;
+                        // تشغيل صوت عند ظهور طلب جديد في القائمة
+                        // (ملاحظة: المتصفحات قد تمنع الصوت بدون تفاعل مسبق)
+                        
+                        const div = document.createElement('div');
+                        div.className = 'order-card';
+                        div.innerHTML = `
+                            <div style="overflow:hidden; margin-bottom:5px;">
+                                <span class="price-badge">${o.price} DA</span>
+                                <h4 style="margin:0 10px; display:inline-block;">${o.foodName}</h4>
+                            </div>
+                            <p style="font-size:0.9em; color:#666; margin:5px 0;">
+                                <i class="fas fa-store"></i> ${o.storeName}<br>
+                                <i class="fas fa-user"></i> ${o.customerName}
+                            </p>
+                            <button onclick="window.acceptOrder('${key}')">قبول الطلب</button>
+                        `;
+                        list.appendChild(div);
                     }
                 });
-                if(count === 0) document.getElementById('orders-list').innerHTML = `<p style="text-align:center;color:#999;margin-top:20px;">${texts[currentLang].noOrders}</p>`;
+
+                if(!hasOrders) list.innerHTML = `<p style="text-align:center;color:#999;margin-top:30px;">${texts[currentLang].noOrders}</p>`;
             });
-        }
-
-        function addOrderToDashboard(key, order) {
-            const list = document.getElementById('orders-list');
-            // Check if already exists to avoid duplicates visually if full refresh didn't happen
-            if(document.getElementById(`ord-${key}`)) return;
-
-            // Notification Sound
-            document.getElementById('notif-sound').play().catch(()=>{});
-
-            const div = document.createElement('div');
-            div.className = 'order-card';
-            div.id = `ord-${key}`;
-            div.innerHTML = `
-                <div style="overflow:hidden; margin-bottom:5px;">
-                    <span class="price-badge">${order.price} DA</span>
-                    <h4 style="margin:0 10px; display:inline-block;">${order.foodName}</h4>
-                </div>
-                <p style="font-size:0.9em; color:#666; margin:5px 0;">
-                    <i class="fas fa-store"></i> ${order.storeName}<br>
-                    <i class="fas fa-map-marker-alt"></i> مسافة تقريبية
-                </p>
-                <button onclick="window.acceptOrder('${key}')">قبول الطلب</button>
-            `;
-            list.appendChild(div);
         }
 
         window.acceptOrder = (orderId) => {
+            document.getElementById('notif-sound').play().catch(()=>{}); // محاولة تشغيل الصوت
             const orderRef = ref(db, 'orders/' + orderId);
+            
             runTransaction(orderRef, (currentData) => {
                 if (currentData && currentData.status === 'pending') {
                     currentData.status = 'accepted';
@@ -581,7 +603,7 @@
                     currentData.riderPhone = userData.phone;
                     return currentData;
                 } else {
-                    return; // Abort
+                    return; // تم قبوله من شخص آخر
                 }
             }).then((result) => {
                 if (result.committed) {
@@ -596,33 +618,28 @@
 
         function startMission() {
             showScreen('screen-rider-active');
-            // Fill Data
+            
             document.getElementById('active-store').innerText = activeOrderData.storeName;
             document.getElementById('active-food').innerText = activeOrderData.foodName;
             document.getElementById('active-drink').innerText = activeOrderData.drinkName || "--";
             document.getElementById('active-cust-name').innerText = activeOrderData.customerName;
             document.getElementById('btn-call-cust').href = "tel:" + activeOrderData.customerPhone;
 
-            // Map
             initMap('map-rider', activeOrderData.customerLat, activeOrderData.customerLng, true);
 
-            // Start GPS Tracking
+            // بدء تتبع موقع الموصل
             if(navigator.geolocation) {
                 riderWatchId = navigator.geolocation.watchPosition((pos) => {
                     const rLat = pos.coords.latitude;
                     const rLng = pos.coords.longitude;
 
-                    // Update Map
                     updateMarker('rider', rLat, rLng);
                     
-                    // Update DB
                     update(ref(db, 'orders/' + activeOrderData.key), {
                         riderLat: rLat,
                         riderLng: rLng
                     });
 
-                    // Auto Finish if close (50m) & status is delivering
-                    // Simple distance calc omitted for brevity, rely on manual button usually better for web
                 }, null, {enableHighAccuracy: true});
             }
         }
@@ -630,7 +647,6 @@
         window.updateStatus = (newSt) => {
             if(!activeOrderData) return;
             
-            // Visual
             const btnIdMap = {'heading_to_store':'btn-st-1', 'ordered':'btn-st-2', 'delivering':'btn-st-4', 'completed':'btn-st-5'};
             if(btnIdMap[newSt]) document.getElementById(btnIdMap[newSt]).classList.add('done');
 
@@ -647,9 +663,10 @@
 
         window.uploadInvoice = () => {
             const file = document.getElementById('invoice-file').files[0];
+            const btn = document.getElementById('btn-upload');
             if(!file) return alert("اختر صورة أولاً");
             
-            document.getElementById('btn-upload').innerText = "جاري الرفع...";
+            btn.innerText = "جاري الرفع...";
             const sRefImg = sRef(storage, 'invoices/' + activeOrderData.key + '_' + Date.now());
             
             uploadBytes(sRefImg, file).then((snap) => {
@@ -657,16 +674,19 @@
                     update(ref(db, 'orders/' + activeOrderData.key), { invoiceUrl: url });
                     document.getElementById('invoice-preview').src = url;
                     document.getElementById('invoice-preview').style.display = 'block';
-                    document.getElementById('btn-upload').innerText = "تم الرفع";
+                    btn.innerText = "تم الرفع بنجاح";
+                    btn.disabled = true;
                 });
+            }).catch(err => {
+                alert("فشل الرفع: " + err.message);
+                btn.innerText = "حاول مرة أخرى";
             });
         };
 
-        // --- Shared Helper Functions ---
+        // --- أدوات مساعدة ---
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(id).classList.add('active-screen');
-            // Map resize fix
             setTimeout(() => { if(map) map.invalidateSize(); }, 500);
         };
 
@@ -676,23 +696,21 @@
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Update simple text
             for (const [key, val] of Object.entries(texts[l])) {
                 const el = document.getElementById('txt-' + key) || document.getElementById('lbl-' + key);
                 if(el) el.innerText = val;
             }
         };
 
-        // Map Logic
-        const custIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/3003/3003984.png', iconSize:[40,40]}); // Person
-        const bikeIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/713/713311.png', iconSize:[40,40]}); // Bike
+        // إعداد الخرائط
+        const custIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/3003/3003984.png', iconSize:[40,40]}); // أيقونة الزبون
+        const bikeIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/713/713311.png', iconSize:[40,40]}); // أيقونة الدراجة
 
         function initMap(divId, lat, lng, isRiderView) {
             if(map) { map.remove(); markers = {}; }
             map = L.map(divId).setView([lat, lng], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            // Customer Marker (Static)
             markers['customer'] = L.marker([lat, lng], {icon: custIcon}).addTo(map)
                 .bindPopup(isRiderView ? "الزبون" : "موقعك").openPopup();
         }
