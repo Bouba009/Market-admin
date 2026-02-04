@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر جوبا - تسوق أونلاين</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="https://via.placeholder.com/60x60/FF6B35/ffffff?text=G" alt="Logo" class="logo" id="storeLogo">
+                    <h1 class="store-name" id="storeName">متجر جوبا</h1>
+                </div>
+                
+                <nav class="main-nav">
+                    <a href="#home">الرئيسية</a>
+                    <a href="#products">المنتجات</a>
+                    <a href="#offers">العروض</a>
+                    <a href="#about">من نحن</a>
+                </nav>
+                
+                <div class="header-actions">
+                    <button class="icon-btn" id="cartBtn">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                    <button class="btn-secondary" id="loginBtn">تسجيل الدخول</button>
+                    <button class="btn-primary" id="registerBtn">إنشاء حساب</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Slider Section -->
+    <section class="slider-section">
+        <div class="slider">
+            <div class="slide active">
+                <img src="https://via.placeholder.com/1920x600/FF6B35/ffffff?text=عرض+خاص+1" alt="Slide 1">
+            </div>
+            <div class="slide">
+                <img src="https://via.placeholder.com/1920x600/4ECDC4/ffffff?text=عرض+خاص+2" alt="Slide 2">
+            </div>
+            <div class="slide">
+                <img src="https://via.placeholder.com/1920x600/FFE66D/ffffff?text=عرض+خاص+3" alt="Slide 3">
+            </div>
+        </div>
+        <div class="slider-dots">
+            <span class="dot active" data-slide="0"></span>
+            <span class="dot" data-slide="1"></span>
+            <span class="dot" data-slide="2"></span>
+        </div>
+    </section>
+
+    <!-- Scrolling Banner -->
+    <div class="scrolling-banner">
+        <div class="banner-content" id="bannerText">
+            <span>🔥 استفد من عرض اليوم (عرض محدود) 🔥 خصم يصل إلى 50% 🔥 شحن مجاني للطلبات فوق 500 دج 🔥 استفد من عرض اليوم (عرض محدود) 🔥</span>
+        </div>
+    </div>
+
+    <!-- Category Filter -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="categories-scroll">
+                <button class="category-btn active" data-category="all">الكل</button>
+                <button class="category-btn" data-category="ملابس">ملابس</button>
+                <button class="category-btn" data-category="إلكترونيات">إلكترونيات</button>
+                <button class="category-btn" data-category="إكسسوارات">إكسسوارات</button>
+                <button class="category-btn" data-category="منزل">منزل</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            <h2 class="section-title">منتجاتنا المميزة</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Shipping Info Animation -->
+    <section class="shipping-section">
+        <div class="container">
+            <div class="shipping-grid">
+                <div class="shipping-card">
+                    <div class="shipping-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>شحن سريع</h3>
+                    <p>توصيل خلال 24-48 ساعة</p>
+                </div>
+                <div class="shipping-card">
+                    <div class="shipping-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>دفع آمن</h3>
+                    <p>جميع المعاملات محمية</p>
+                </div>
+                <div class="shipping-card">
+                    <div class="shipping-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <h3>إرجاع مجاني</h3>
+                    <p>خلال 14 يوم من الاستلام</p>
+                </div>
+                <div class="shipping-card">
+                    <div class="shipping-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>دعم 24/7</h3>
+                    <p>نحن هنا لمساعدتك</p>
+                </div>
+            </div>
+            
+            <div class="shipping-policy">
+                <h3>سياسة الشحن</h3>
+                <p>نقوم بالشحن إلى جميع ولايات الجزائر. الشحن مجاني للطلبات فوق 500 دج. التوصيل يتم خلال 2-5 أيام عمل حسب الولاية.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>حول المتجر</h4>
+                    <ul>
+                        <li><a href="#about">من نحن</a></li>
+                        <li><a href="#contact">اتصل بنا</a></li>
+                        <li><a href="#privacy">سياسة الخصوصية</a></li>
+                        <li><a href="#terms">الشروط والأحكام</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>خدمة العملاء</h4>
+                    <ul>
+                        <li><a href="#shipping">سياسة الشحن</a></li>
+                        <li><a href="#returns">الإرجاع والاستبدال</a></li>
+                        <li><a href="#faq">الأسئلة الشائعة</a></li>
+                        <li><a href="#payment">طرق الدفع</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>الفئات</h4>
+                    <ul id="footerCategories">
+                        <li><a href="#category">ملابس</a></li>
+                        <li><a href="#category">إلكترونيات</a></li>
+                        <li><a href="#category">إكسسوارات</a></li>
+                        <li><a href="#category">منزل</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>تابعنا</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> 0555 123 456</p>
+                        <p><i class="fas fa-envelope"></i> info@gouba.dz</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 متجر جوبا. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>سلة التسوق</h3>
+            <button class="close-cart" id="closeCart">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <p class="empty-cart">السلة فارغة</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>المجموع:</span>
+                <span id="cartTotal">0 دج</span>
+            </div>
+            <button class="btn-primary btn-block" id="checkoutBtn">إتمام الطلب</button>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content product-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="productModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content order-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>إتمام الطلب</h2>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <textarea name="address" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>الولاية</label>
+                    <input type="text" name="wilaya" required>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظات (اختياري)</label>
+                    <textarea name="notes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-primary btn-block">تأكيد الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
