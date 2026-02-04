@@ -14,52 +14,78 @@
         :root {
             --primary: #FF5722;
             --secondary: #2196F3;
-            --bg: #f4f4f4;
+            --bg: #f8f9fa;
             --text: #333;
+            --card-bg: #ffffff;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
         
         /* Language Toggle */
-        .lang-switch { position: absolute; top: 10px; left: 10px; z-index: 1000; }
-        .lang-btn { background: #fff; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; }
+        .lang-switch { position: absolute; top: 15px; left: 15px; z-index: 2000; }
+        .lang-btn { background: #fff; border: 1px solid #ccc; padding: 5px 12px; cursor: pointer; border-radius: 20px; font-weight: bold; }
         .lang-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
         /* Screens */
-        .screen { display: none; padding: 20px; max-width: 600px; margin: 0 auto; min-height: 100vh; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .active-screen { display: block; }
+        .screen { display: none; padding: 20px; max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--card-bg); box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        .active-screen { display: block; animation: fadeIn 0.3s ease-in-out; }
 
-        h1, h2 { text-align: center; color: var(--primary); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 20px; }
         
         /* Forms */
         .form-group { margin-bottom: 15px; }
-        input, select, button { width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; }
-        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #E64A19; }
+        label { font-weight: bold; font-size: 0.9em; color: #666; display: block; margin-bottom: 5px; }
+        input, select, button { width: 100%; padding: 14px; margin-top: 5px; box-sizing: border-box; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; }
+        input:focus { outline: none; border-color: var(--primary); }
         
-        /* Role Selection */
-        .role-card { text-align: center; padding: 20px; border: 2px solid #eee; margin: 10px 0; cursor: pointer; border-radius: 10px; }
-        .role-card:hover { border-color: var(--primary); }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button:hover { background: #E64A19; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        button.secondary { background: #fff; color: #555; border: 1px solid #ddd; }
+        button.secondary:hover { background: #f0f0f0; }
+
+        /* Auth Links */
+        .auth-link { text-align: center; margin-top: 15px; font-size: 0.9em; }
+        .auth-link span { color: var(--secondary); cursor: pointer; text-decoration: underline; }
+
+        /* Dashboard Grid (Rider) */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 Columns */
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .stat-card i { font-size: 24px; color: var(--secondary); margin-bottom: 10px; }
+        .stat-card h4 { margin: 5px 0; font-size: 20px; color: #333; }
+        .stat-card p { margin: 0; font-size: 12px; color: #888; }
 
         /* Map */
-        #map-customer, #map-rider { height: 300px; width: 100%; border-radius: 10px; margin-top: 10px; }
+        #map-customer, #map-rider { height: 350px; width: 100%; border-radius: 12px; margin-top: 15px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         
-        /* Order Card (Rider) */
-        .order-card { background: #fff4e5; border: 1px solid #ffcc80; padding: 15px; margin-bottom: 10px; border-radius: 8px; animation: slideIn 0.5s; }
-        .price-tag { float: left; background: green; color: white; padding: 2px 8px; border-radius: 4px; }
-        
+        /* Order Card */
+        .order-card { background: #fff; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .price-badge { background: #4CAF50; color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; float: left; }
+
         /* Status Steps */
-        .status-steps button { margin-bottom: 5px; background: var(--secondary); }
-        .status-steps button.done { background: gray; cursor: not-allowed; }
+        .status-steps button { margin-bottom: 8px; background: #e0e0e0; color: #333; text-align: right; padding-right: 20px; }
+        .status-steps button.active-step { background: var(--secondary); color: white; }
+        .status-steps button.done { background: #81C784; color: white; cursor: default; }
 
-        /* Invoice Image */
-        #invoice-preview, #customer-invoice-view { max-width: 100%; margin-top: 10px; border-radius: 5px; display: none; }
-
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* Invoice */
+        #invoice-preview, #customer-invoice-view { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; display: none; }
         
-        /* Utilities */
-        .hidden { display: none !important; }
-        .loader { text-align: center; margin: 20px; }
+        .error-msg { color: red; font-size: 0.85em; text-align: center; display: none; margin-top: 5px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -70,234 +96,379 @@
         <button class="lang-btn" onclick="setLang('fr')">FR</button>
     </div>
 
-    <!-- Audio for Notification -->
     <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
-    <!-- 1. Selection Screen -->
-    <div id="screen-select" class="screen active-screen">
-        <h1 id="txt-welcome">Comondi</h1>
-        <p style="text-align:center" id="txt-choose-role">اختر هويتك</p>
+    <!-- 1. Authentication Screens -->
+    
+    <!-- Login -->
+    <div id="screen-login" class="screen active-screen">
+        <h1>Comondi</h1>
+        <h3 id="txt-login-title">تسجيل الدخول</h3>
+        <input type="email" id="login-email" placeholder="البريد الإلكتروني (Email)">
+        <input type="password" id="login-pass" placeholder="كلمة المرور (Password)">
+        <p id="login-error" class="error-msg"></p>
+        <button onclick="handleLogin()" id="btn-login">دخول</button>
         
-        <div class="role-card" onclick="showScreen('screen-customer')">
-            <i class="fas fa-user fa-3x"></i>
-            <h3 id="txt-iam-customer">أنا زبون (Client)</h3>
-        </div>
-        
-        <div class="role-card" onclick="showScreen('screen-rider-login')">
-            <i class="fas fa-motorcycle fa-3x"></i>
-            <h3 id="txt-iam-rider">أنا موصل (Livreur)</h3>
+        <div class="auth-link">
+            <span onclick="showScreen('screen-register')" id="lnk-create-acc">ليس لديك حساب؟ إنشاء حساب جديد</span>
         </div>
     </div>
 
-    <!-- 2. Customer Screen: Create Order -->
+    <!-- Register -->
+    <div id="screen-register" class="screen">
+        <h1>Comondi</h1>
+        <h3 id="txt-reg-title">إنشاء حساب جديد</h3>
+        
+        <div class="form-group">
+            <label id="lbl-role">أنت تسجل كـ:</label>
+            <select id="reg-role">
+                <option value="customer" id="opt-customer">زبون (Client)</option>
+                <option value="rider" id="opt-rider">موصل (Livreur)</option>
+            </select>
+        </div>
+
+        <input type="text" id="reg-name" placeholder="الاسم الكامل">
+        <input type="tel" id="reg-phone" placeholder="رقم الهاتف">
+        <input type="email" id="reg-email" placeholder="البريد الإلكتروني">
+        <input type="password" id="reg-pass" placeholder="كلمة المرور (6 أحرف على الأقل)">
+        
+        <p id="reg-error" class="error-msg"></p>
+        <button onclick="handleRegister()" id="btn-register">تسجيل</button>
+        
+        <div class="auth-link">
+            <span onclick="showScreen('screen-login')" id="lnk-have-acc">لديك حساب؟ تسجيل دخول</span>
+        </div>
+    </div>
+
+    <!-- 2. Customer: Create Order -->
     <div id="screen-customer" class="screen">
-        <button onclick="showScreen('screen-select')" style="background:#999; width:auto; margin-bottom:10px;">&larr;</button>
-        <h2 id="txt-new-order">طلب جديد</h2>
-        
-        <div class="form-group">
-            <label id="lbl-food">اسم الأكل (مثل: Tacos, Sandwich)</label>
-            <input type="text" id="food-name" placeholder="...">
-        </div>
-        <div class="form-group">
-            <label id="lbl-store">اسم المحل (مثل: Adm Food)</label>
-            <input type="text" id="store-name" placeholder="...">
+        <div style="display:flex; justify-content:space-between;">
+            <button onclick="logout()" class="secondary" style="width:auto; padding:5px 10px;">خروج</button>
+            <h2 id="txt-welcome-cust">أهلاً بك</h2>
         </div>
         
-        <button onclick="createOrder()" id="btn-order-now">اطلب الآن (مشاركة الموقع GPS)</button>
-        <div id="customer-status" class="loader hidden"></div>
+        <h3 id="txt-new-order">طلب جديد</h3>
+        
+        <div class="form-group">
+            <label id="lbl-food">ماذا تريد أن تأكل؟</label>
+            <input type="text" id="food-name" placeholder="مثال: Tacos, Pizza...">
+        </div>
+        
+        <div class="form-group">
+            <label id="lbl-drink">اسم المشروب (اختياري)</label>
+            <input type="text" id="drink-name" placeholder="مثال: Coca Cola, Jus...">
+        </div>
+
+        <div class="form-group">
+            <label id="lbl-store">اسم المحل</label>
+            <input type="text" id="store-name" placeholder="مثال: Adm Food...">
+        </div>
+        
+        <button onclick="createOrder()" id="btn-order-now">اطلب وشارك موقعك GPS</button>
+        <div id="gps-loader" class="loader"></div>
+        <p id="gps-error" class="error-msg"></p>
     </div>
 
-    <!-- 3. Customer Screen: Tracking -->
+    <!-- 3. Customer: Tracking -->
     <div id="screen-tracking" class="screen">
-        <h2 id="txt-tracking">تتبع الطلب</h2>
-        <div id="tracking-info">
-            <p><strong>Status:</strong> <span id="order-status-text">بانتظار القبول...</span></p>
-            <p id="rider-phone-display" class="hidden"><i class="fas fa-phone"></i> <span id="rider-phone-val"></span></p>
+        <h2 id="txt-tracking">تتبع طلبك</h2>
+        <div style="text-align:center; padding:10px; background:#e3f2fd; border-radius:8px;">
+            <p style="margin:0; font-weight:bold; color:var(--secondary);" id="order-status-text">بانتظار القبول...</p>
         </div>
+        
+        <div id="rider-info-box" class="hidden" style="margin-top:10px; padding:10px; background:#fff3e0; border-radius:8px;">
+            <p style="margin:5px 0"><i class="fas fa-motorcycle"></i> <strong>الموصل:</strong> <span id="rider-name-display">...</span></p>
+            <p style="margin:5px 0"><i class="fas fa-phone"></i> <span id="rider-phone-display">...</span></p>
+        </div>
+
         <div id="map-customer"></div>
         
         <div id="invoice-area" class="hidden">
-            <h3 id="txt-invoice">صورة الفاتورة</h3>
+            <h3 id="txt-invoice">فاتورة المشتريات</h3>
             <img id="customer-invoice-view" src="" alt="Invoice">
         </div>
     </div>
 
-    <!-- 4. Rider Screen: Login/Dashboard -->
-    <div id="screen-rider-login" class="screen">
-        <button onclick="showScreen('screen-select')" style="background:#999; width:auto; margin-bottom:10px;">&larr;</button>
-        <h2 id="txt-rider-login">دخول الموصلين</h2>
-        <input type="text" id="rider-name" placeholder="اسمك">
-        <input type="tel" id="rider-phone" placeholder="رقم هاتفك">
-        <button onclick="riderLogin()" id="btn-start-work">ابدأ العمل</button>
-    </div>
-
+    <!-- 4. Rider: Dashboard -->
     <div id="screen-rider-dashboard" class="screen">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 id="txt-avail-orders">الطلبات المتاحة</h2>
-            <small id="rider-status-dot" style="color:green;">● متصل</small>
+            <h2 style="margin:0;" id="txt-dash">لوحة التحكم</h2>
+            <button onclick="logout()" class="secondary" style="width:auto; margin:0; padding:5px 10px;"><i class="fas fa-sign-out-alt"></i></button>
         </div>
+        <p style="text-align:center; color:#777;" id="rider-welcome-name">مرحباً</p>
+
+        <!-- 2x2 Stats Grid -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h4 id="stat-completed">0</h4>
+                <p id="txt-stat-comp">طلبات مكتملة</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-wallet" style="color:#4CAF50;"></i>
+                <h4 id="stat-earnings">0 DA</h4>
+                <p id="txt-stat-earn">الأرباح</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-star" style="color:#FFC107;"></i>
+                <h4>4.8</h4>
+                <p id="txt-stat-rate">التقييم</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-signal" style="color:var(--primary);"></i>
+                <h4 id="txt-online">متصل</h4>
+                <p id="txt-stat-st">الحالة</p>
+            </div>
+        </div>
+
+        <h3 style="text-align:right;" id="txt-avail-orders">الطلبات الواردة</h3>
         <div id="orders-list">
-            <!-- Orders will appear here -->
-            <p style="text-align:center; color:#999;" id="txt-waiting-orders">في انتظار طلبات...</p>
+            <p style="text-align:center; color:#999; margin-top:20px;" id="txt-no-orders">لا توجد طلبات حالياً...</p>
         </div>
     </div>
 
-    <!-- 5. Rider Screen: Active Order -->
+    <!-- 5. Rider: Active Mission -->
     <div id="screen-rider-active" class="screen">
-        <h2 id="txt-active-mission">مهمة جارية</h2>
-        <div style="background:#eee; padding:10px; border-radius:5px;">
-            <h3 id="active-food"></h3>
-            <p id="active-store"></p>
-            <p>السعر: 100 DA</p>
-            <p><i class="fas fa-phone"></i> الزبون: <span id="active-customer-phone">0555...</span></p>
+        <h3 id="txt-mission">المهمة الحالية</h3>
+        
+        <div class="order-card" style="border-color:var(--secondary);">
+            <div style="display:flex; justify-content:space-between;">
+                <h4 style="margin:0" id="active-store">Store</h4>
+                <span style="background:var(--secondary); color:#fff; padding:2px 8px; border-radius:4px;">100 DA</span>
+            </div>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <p><strong><i class="fas fa-hamburger"></i>:</strong> <span id="active-food"></span></p>
+            <p><strong><i class="fas fa-wine-bottle"></i>:</strong> <span id="active-drink">--</span></p>
+            <p><strong><i class="fas fa-user"></i>:</strong> <span id="active-cust-name">...</span></p>
+            <a id="btn-call-cust" href="#" style="display:block; text-align:center; background:#4CAF50; color:white; padding:8px; text-decoration:none; border-radius:5px; margin-top:5px;">
+                <i class="fas fa-phone"></i> اتصال بالزبون
+            </a>
         </div>
 
         <div id="map-rider"></div>
 
         <div class="status-steps" style="margin-top:20px;">
-            <button onclick="updateStatus('heading_to_store')" id="btn-st-1">1. في طريقي للمحل</button>
-            <button onclick="updateStatus('ordered')" id="btn-st-2">2. تم الطلب</button>
+            <p style="font-size:0.9em; color:#666; margin-bottom:5px;">تحديث الحالة:</p>
+            <button onclick="updateStatus('heading_to_store')" id="btn-st-1">1. أنا في الطريق للمحل</button>
+            <button onclick="updateStatus('ordered')" id="btn-st-2">2. تم شراء الطلب</button>
             
             <!-- Upload Invoice -->
-            <div style="margin: 10px 0; border:1px dashed #ccc; padding:10px;">
-                <label id="lbl-upload">3. تصوير الفاتورة</label>
-                <input type="file" id="invoice-file" accept="image/*">
-                <button onclick="uploadInvoice()" id="btn-upload" style="background:#4CAF50; margin-top:5px;">إرسال الصورة</button>
+            <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:8px; border:1px dashed #ccc;">
+                <label style="font-size:0.8em;">3. تصوير الفاتورة (إجباري)</label>
+                <input type="file" id="invoice-file" accept="image/*" style="font-size:0.8em;">
+                <button onclick="uploadInvoice()" id="btn-upload" class="secondary" style="margin-top:5px; width:auto; font-size:0.8em;">رفع الصورة</button>
                 <img id="invoice-preview" src="">
             </div>
 
-            <button onclick="updateStatus('delivering')" id="btn-st-4">4. تم الاستلام وأنا في الطريق</button>
-            <button onclick="updateStatus('completed')" id="btn-st-5" style="background:#333;">5. تم التوصيل (نهاية)</button>
+            <button onclick="updateStatus('delivering')" id="btn-st-4">4. تم الاستلام، أنا قادم إليك</button>
+            <button onclick="updateStatus('completed')" id="btn-st-5" style="background:#333; color:#fff;">5. تم التوصيل (إنهاء)</button>
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Firebase SDK (Modular via CDN) -->
+    <!-- Firebase SDK Modular -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-        import { getDatabase, ref, push, set, onChildAdded, onValue, update, runTransaction, child, get } 
+        import { getDatabase, ref, push, set, onChildAdded, onValue, update, runTransaction, get, query, orderByChild, equalTo } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Configuration
+        // --- Firebase Config ---
         const firebaseConfig = {
-            apiKey: "AIzaSyACuXD3szL8eudcmU5QtPWRT9Ha8k782DA",
+            apiKey: "AIzaSyACuXD3szL8eudcmU5QtPWRT9Ha8k782DA", // تأكد من صحة المفتاح
             authDomain: "gouba-80f4c.firebaseapp.com",
             projectId: "gouba-80f4c",
             storageBucket: "gouba-80f4c.appspot.com",
             messagingSenderId: "640752558914",
-            appId: "1:640752558914:web:75951a854ee68f4b3b1edb",
-            measurementId: "G-Y5T48PJ38Z"
+            appId: "1:640752558914:web:75951a854ee68f4b3b1edb"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const storage = getStorage(app);
+        const auth = getAuth(app);
         
-        // --- Global Variables ---
-        let currentRole = ''; 
+        // --- Global State ---
+        let currentUser = null;
+        let userData = null;
         let currentLang = 'ar';
         let myOrderId = null;
-        let myRiderId = null; 
         let riderWatchId = null;
         let activeOrderData = null;
-        let map = null;
-        let markers = {};
-
+        let map = null, markers = {};
+        
         // --- Translations ---
         const texts = {
             ar: {
-                welcome: "Comondi", choose: "اختر هويتك", customer: "أنا زبون", rider: "أنا موصل",
-                newOrder: "طلب جديد", food: "اسم الأكل", store: "اسم المحل", orderBtn: "اطلب الآن",
-                tracking: "تتبع الطلب", waiting: "بانتظار القبول...", accepted: "تم قبول الطلب!",
-                invoice: "فاتورة", login: "دخول الموصلين", avail: "الطلبات المتاحة", 
-                startWork: "ابدأ العمل", mission: "مهمة جارية", 
-                st1: "في طريقي للمحل", st2: "تم الطلب", st3: "إرسال الفاتورة", st4: "في الطريق إليك", st5: "تم التوصيل",
-                completed: "تم التوصيل بنجاح!"
+                loginTitle: "تسجيل الدخول", regTitle: "إنشاء حساب جديد",
+                cust: "زبون", rider: "موصل",
+                newOrder: "طلب جديد", food: "الأكل", drink: "المشروب", store: "المحل",
+                orderBtn: "اطلب وشارك موقعك", track: "تتبع الطلب",
+                waiting: "بانتظار القبول...", accepted: "تم قبول الطلب",
+                dash: "لوحة التحكم", avail: "الطلبات الواردة",
+                comp: "طلبات مكتملة", earn: "الأرباح", rate: "التقييم", st: "الحالة",
+                mission: "المهمة الحالية", noOrders: "لا توجد طلبات...",
+                online: "متصل"
             },
             fr: {
-                welcome: "Comondi", choose: "Choisissez votre rôle", customer: "Je suis Client", rider: "Je suis Livreur",
-                newOrder: "Nouvelle Commande", food: "Nom du plat", store: "Nom du magasin", orderBtn: "Commander (GPS)",
-                tracking: "Suivi Commande", waiting: "En attente...", accepted: "Commande acceptée!",
-                invoice: "Facture", login: "Connexion Livreur", avail: "Commandes Disponibles", 
-                startWork: "Commencer", mission: "Mission en cours",
-                st1: "En route vers le magasin", st2: "Commandé", st3: "Envoyer Facture", st4: "En route vers vous", st5: "Livré",
-                completed: "Livraison terminée!"
+                loginTitle: "Connexion", regTitle: "Créer un compte",
+                cust: "Client", rider: "Livreur",
+                newOrder: "Nouvelle Commande", food: "Plat", drink: "Boisson", store: "Magasin",
+                orderBtn: "Commander & Partager GPS", track: "Suivi",
+                waiting: "En attente...", accepted: "Commande acceptée",
+                dash: "Tableau de bord", avail: "Commandes reçues",
+                comp: "Commandes finies", earn: "Gains", rate: "Avis", st: "Statut",
+                mission: "Mission en cours", noOrders: "Aucune commande...",
+                online: "En ligne"
             }
         };
 
-        // --- Shared Functions ---
-        window.setLang = (lang) => {
-            currentLang = lang;
-            document.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update text simply (Partial list for demo)
-            document.getElementById('txt-welcome').innerText = texts[lang].welcome;
-            document.getElementById('txt-choose-role').innerText = texts[lang].choose;
-            document.getElementById('txt-iam-customer').innerText = texts[lang].customer;
-            document.getElementById('txt-iam-rider').innerText = texts[lang].rider;
-            document.getElementById('txt-new-order').innerText = texts[lang].newOrder;
-            document.getElementById('lbl-food').innerText = texts[lang].food;
-            document.getElementById('lbl-store').innerText = texts[lang].store;
-            document.getElementById('btn-order-now').innerText = texts[lang].orderBtn;
-            document.getElementById('txt-tracking').innerText = texts[lang].tracking;
-            // ... add others as needed
+        // --- Auth Logic ---
+        window.handleRegister = () => {
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const role = document.getElementById('reg-role').value;
+            const errBox = document.getElementById('reg-error');
+
+            if(!email || !pass || !name || !phone) {
+                errBox.innerText = "يرجى ملء جميع الحقول"; errBox.style.display='block'; return;
+            }
+
+            createUserWithEmailAndPassword(auth, email, pass)
+            .then((userCredential) => {
+                const uid = userCredential.user.uid;
+                // Save user details in DB
+                set(ref(db, 'users/' + uid), {
+                    name: name,
+                    phone: phone,
+                    role: role,
+                    email: email
+                }).then(() => {
+                    // Auth state change will handle navigation
+                });
+            })
+            .catch((error) => {
+                errBox.innerText = error.message;
+                errBox.style.display='block';
+            });
         };
 
-        window.showScreen = (id) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.getElementById(id).classList.add('active-screen');
-            if(id === 'screen-tracking' || id === 'screen-rider-active') {
-                setTimeout(() => { if(map) map.invalidateSize(); }, 500); // Fix map rendering
-            }
+        window.handleLogin = () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const errBox = document.getElementById('login-error');
+
+            signInWithEmailAndPassword(auth, email, pass)
+            .catch((error) => {
+                errBox.innerText = "خطأ في البريد أو كلمة المرور";
+                errBox.style.display='block';
+            });
         };
+
+        window.logout = () => {
+            signOut(auth).then(() => window.location.reload());
+        };
+
+        // Listen for auth state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                // Fetch User Role
+                get(ref(db, 'users/' + user.uid)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        userData = snapshot.val();
+                        if (userData.role === 'customer') {
+                            showScreen('screen-customer');
+                            document.getElementById('txt-welcome-cust').innerText = "مرحباً " + userData.name;
+                        } else {
+                            showScreen('screen-rider-dashboard');
+                            document.getElementById('rider-welcome-name').innerText = userData.name;
+                            initRiderDashboard();
+                        }
+                    }
+                });
+            } else {
+                showScreen('screen-login');
+            }
+        });
 
         // --- Customer Logic ---
         window.createOrder = () => {
             const food = document.getElementById('food-name').value;
+            const drink = document.getElementById('drink-name').value;
             const store = document.getElementById('store-name').value;
-            
-            if(!food || !store) return alert("الرجاء ملء جميع الحقول");
+            const errBox = document.getElementById('gps-error');
+            const loader = document.getElementById('gps-loader');
 
-            document.getElementById('btn-order-now').disabled = true;
-            document.getElementById('customer-status').innerText = "جاري تحديد الموقع...";
-            document.getElementById('customer-status').classList.remove('hidden');
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-
-                    const newOrderRef = push(ref(db, 'orders'));
-                    myOrderId = newOrderRef.key;
-
-                    set(newOrderRef, {
-                        foodName: food,
-                        storeName: store,
-                        customerLat: lat,
-                        customerLng: lng,
-                        customerPhone: "05XXXXXXXX", // In real app, ask for input
-                        status: 'pending',
-                        price: 100,
-                        riderId: null,
-                        timestamp: Date.now()
-                    }).then(() => {
-                        showScreen('screen-tracking');
-                        initCustomerMap(lat, lng);
-                        listenToMyOrder();
-                    });
-
-                }, () => alert("فشل تحديد الموقع. تأكد من تفعيل GPS"));
-            } else {
-                alert("المتصفح لا يدعم GPS");
+            if(!food || !store) {
+                alert("يرجى إدخال اسم الأكل واسم المحل");
+                return;
             }
+
+            errBox.style.display = 'none';
+            loader.style.display = 'block';
+            document.getElementById('btn-order-now').disabled = true;
+
+            if (!navigator.geolocation) {
+                handleLocationError("المتصفح لا يدعم GPS");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition((position) => {
+                // Success
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                const newOrderRef = push(ref(db, 'orders'));
+                myOrderId = newOrderRef.key;
+
+                set(newOrderRef, {
+                    customerId: currentUser.uid,
+                    customerName: userData.name,
+                    customerPhone: userData.phone,
+                    foodName: food,
+                    drinkName: drink || "",
+                    storeName: store,
+                    customerLat: lat,
+                    customerLng: lng,
+                    status: 'pending',
+                    price: 100, // Fixed price as requested
+                    timestamp: Date.now()
+                }).then(() => {
+                    loader.style.display = 'none';
+                    showScreen('screen-tracking');
+                    initMap('map-customer', lat, lng, false); // false = not rider mode
+                    listenToMyOrder();
+                });
+
+            }, (error) => {
+                // Error handling
+                let msg = "فشل تحديد الموقع.";
+                if(error.code === 1) msg = "يجب السماح للموقع من إعدادات المتصفح.";
+                else if(error.code === 2) msg = "الGPS غير متاح، تأكد من تشغيله.";
+                else if(window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                    msg = "يجب تشغيل الموقع على رابط HTTPS ليعمل الـ GPS.";
+                }
+                handleLocationError(msg);
+            }, { enableHighAccuracy: true, timeout: 10000 });
         };
+
+        function handleLocationError(msg) {
+            const loader = document.getElementById('gps-loader');
+            const errBox = document.getElementById('gps-error');
+            loader.style.display = 'none';
+            document.getElementById('btn-order-now').disabled = false;
+            errBox.innerText = msg;
+            errBox.style.display = 'block';
+            alert(msg);
+        }
 
         function listenToMyOrder() {
             const orderRef = ref(db, 'orders/' + myOrderId);
@@ -307,26 +478,25 @@
 
                 const statusTxt = document.getElementById('order-status-text');
                 
-                // Update text based on status
-                if(data.status === 'pending') statusTxt.innerText = texts[currentLang].waiting;
-                else if (data.status === 'completed') {
-                    statusTxt.innerText = texts[currentLang].completed;
-                    statusTxt.style.color = "green";
-                    alert(texts[currentLang].completed);
+                // Translate Status
+                let stDisp = data.status;
+                if(stDisp === 'pending') stDisp = texts[currentLang].waiting;
+                else if(stDisp === 'completed') {
+                    stDisp = "تم التوصيل بنجاح شكراً لك!";
+                    alert("وصل طلبك!");
                 } else {
-                    statusTxt.innerText = texts[currentLang].accepted + " (" + getStatusText(data.status) + ")";
+                    stDisp = texts[currentLang].accepted;
+                    // Rider Info
+                    if(data.riderName) {
+                        document.getElementById('rider-info-box').classList.remove('hidden');
+                        document.getElementById('rider-name-display').innerText = data.riderName;
+                        document.getElementById('rider-phone-display').innerText = data.riderPhone;
+                    }
+                    if(data.riderLat) {
+                        updateMarker('rider', data.riderLat, data.riderLng);
+                    }
                 }
-
-                // If Rider accepted
-                if(data.riderId && data.riderLat) {
-                    // Update Map with Rider Icon
-                    updateRiderMarkerOnMap(data.riderLat, data.riderLng);
-                    
-                    // Show Rider Info
-                    document.getElementById('rider-phone-display').classList.remove('hidden');
-                    // In real app retrieve rider phone from users/riderId, here we assume it's stored or just show placeholder
-                    document.getElementById('rider-phone-val').innerText = "Rider Contact"; 
-                }
+                statusTxt.innerText = stDisp;
 
                 // Invoice
                 if(data.invoiceUrl) {
@@ -338,216 +508,205 @@
         }
 
         // --- Rider Logic ---
-        window.riderLogin = () => {
-            const name = document.getElementById('rider-name').value;
-            const phone = document.getElementById('rider-phone').value;
-            if(!name) return;
+        function initRiderDashboard() {
+            // 1. Calculate Stats (Orders completed by me)
+            const ordersQuery = query(ref(db, 'orders'), orderByChild('riderId'), equalTo(currentUser.uid));
             
-            myRiderId = phone; // Simple ID for demo
-            showScreen('screen-rider-dashboard');
-            listenForNewOrders();
-        };
+            onValue(ordersQuery, (snapshot) => {
+                let completedCount = 0;
+                snapshot.forEach(child => {
+                    if(child.val().status === 'completed') completedCount++;
+                });
+                
+                document.getElementById('stat-completed').innerText = completedCount;
+                document.getElementById('stat-earnings').innerText = (completedCount * 100) + " DA";
+            });
 
-        function listenForNewOrders() {
-            const ordersRef = ref(db, 'orders');
-            document.getElementById('orders-list').innerHTML = ""; // Clear
-
-            onChildAdded(ordersRef, (snapshot) => {
+            // 2. Listen for NEW pending orders
+            const allOrdersRef = ref(db, 'orders');
+            onChildAdded(allOrdersRef, (snapshot) => {
                 const order = snapshot.val();
-                const key = snapshot.key;
-
                 if(order.status === 'pending') {
-                    // Play Sound
-                    document.getElementById('notif-sound').play().catch(e => console.log(e));
-
-                    const div = document.createElement('div');
-                    div.className = 'order-card';
-                    div.id = `order-${key}`;
-                    div.innerHTML = `
-                        <div style="overflow:hidden">
-                            <span class="price-tag">${order.price} DA</span>
-                            <h3 style="margin:0 10px">${order.foodName}</h3>
-                        </div>
-                        <p>${order.storeName}</p>
-                        <button onclick="acceptOrder('${key}')">قبول الطلب</button>
-                    `;
-                    document.getElementById('orders-list').appendChild(div);
+                    addOrderToDashboard(snapshot.key, order);
                 }
             });
 
-            // Remove order if taken by someone else
-            onValue(ordersRef, (snapshot) => {
-                snapshot.forEach(childSnap => {
-                    const val = childSnap.val();
-                    const el = document.getElementById(`order-${childSnap.key}`);
-                    if(el && val.status !== 'pending') {
-                        el.remove();
+            // Monitor removed/taken orders
+            onValue(allOrdersRef, (snap) => {
+                document.getElementById('orders-list').innerHTML = ""; // Refresh list
+                let count = 0;
+                snap.forEach(child => {
+                    const o = child.val();
+                    if(o.status === 'pending') {
+                        addOrderToDashboard(child.key, o);
+                        count++;
                     }
                 });
+                if(count === 0) document.getElementById('orders-list').innerHTML = `<p style="text-align:center;color:#999;margin-top:20px;">${texts[currentLang].noOrders}</p>`;
             });
+        }
+
+        function addOrderToDashboard(key, order) {
+            const list = document.getElementById('orders-list');
+            // Check if already exists to avoid duplicates visually if full refresh didn't happen
+            if(document.getElementById(`ord-${key}`)) return;
+
+            // Notification Sound
+            document.getElementById('notif-sound').play().catch(()=>{});
+
+            const div = document.createElement('div');
+            div.className = 'order-card';
+            div.id = `ord-${key}`;
+            div.innerHTML = `
+                <div style="overflow:hidden; margin-bottom:5px;">
+                    <span class="price-badge">${order.price} DA</span>
+                    <h4 style="margin:0 10px; display:inline-block;">${order.foodName}</h4>
+                </div>
+                <p style="font-size:0.9em; color:#666; margin:5px 0;">
+                    <i class="fas fa-store"></i> ${order.storeName}<br>
+                    <i class="fas fa-map-marker-alt"></i> مسافة تقريبية
+                </p>
+                <button onclick="window.acceptOrder('${key}')">قبول الطلب</button>
+            `;
+            list.appendChild(div);
         }
 
         window.acceptOrder = (orderId) => {
             const orderRef = ref(db, 'orders/' + orderId);
-            
             runTransaction(orderRef, (currentData) => {
                 if (currentData && currentData.status === 'pending') {
                     currentData.status = 'accepted';
-                    currentData.riderId = myRiderId;
+                    currentData.riderId = currentUser.uid;
+                    currentData.riderName = userData.name;
+                    currentData.riderPhone = userData.phone;
                     return currentData;
                 } else {
-                    return; // Abort if already taken
+                    return; // Abort
                 }
             }).then((result) => {
                 if (result.committed) {
                     activeOrderData = result.snapshot.val();
-                    activeOrderData.key = orderId; // save key
-                    startRiderMission(activeOrderData);
+                    activeOrderData.key = orderId;
+                    startMission();
                 } else {
-                    alert("سبقك إليها موصل آخر!");
+                    alert("عذراً، تم قبول الطلب من شخص آخر.");
                 }
             });
         };
 
-        function startRiderMission(order) {
+        function startMission() {
             showScreen('screen-rider-active');
-            document.getElementById('active-food').innerText = order.foodName;
-            document.getElementById('active-store').innerText = order.storeName;
-            document.getElementById('active-customer-phone').innerText = order.customerPhone;
+            // Fill Data
+            document.getElementById('active-store').innerText = activeOrderData.storeName;
+            document.getElementById('active-food').innerText = activeOrderData.foodName;
+            document.getElementById('active-drink').innerText = activeOrderData.drinkName || "--";
+            document.getElementById('active-cust-name').innerText = activeOrderData.customerName;
+            document.getElementById('btn-call-cust').href = "tel:" + activeOrderData.customerPhone;
 
-            // Initialize Rider Map
-            initRiderMap(order.customerLat, order.customerLng);
+            // Map
+            initMap('map-rider', activeOrderData.customerLat, activeOrderData.customerLng, true);
 
-            // Start Tracking Rider GPS
+            // Start GPS Tracking
             if(navigator.geolocation) {
                 riderWatchId = navigator.geolocation.watchPosition((pos) => {
                     const rLat = pos.coords.latitude;
                     const rLng = pos.coords.longitude;
+
+                    // Update Map
+                    updateMarker('rider', rLat, rLng);
                     
                     // Update DB
-                    update(ref(db, 'orders/' + order.key), {
+                    update(ref(db, 'orders/' + activeOrderData.key), {
                         riderLat: rLat,
                         riderLng: rLng
                     });
 
-                    // Update Map
-                    updateRiderMarkerOnMap(rLat, rLng, true); // True = centered on rider
-
-                    // Check Proximity (Auto Finish)
-                    const dist = getDistanceFromLatLonInKm(rLat, rLng, order.customerLat, order.customerLng);
-                    if(dist < 0.05 && order.status === 'delivering') { // Less than 50 meters
-                         updateStatus('completed');
-                         alert("وصلت للزبون!");
-                    }
-
-                }, null, { enableHighAccuracy: true });
+                    // Auto Finish if close (50m) & status is delivering
+                    // Simple distance calc omitted for brevity, rely on manual button usually better for web
+                }, null, {enableHighAccuracy: true});
             }
         }
 
-        window.updateStatus = (newStatus) => {
+        window.updateStatus = (newSt) => {
             if(!activeOrderData) return;
-            update(ref(db, 'orders/' + activeOrderData.key), {
-                status: newStatus
-            });
-            // Visual feedback
-            const btnMap = {
-                'heading_to_store': 'btn-st-1',
-                'ordered': 'btn-st-2',
-                'delivering': 'btn-st-4',
-                'completed': 'btn-st-5'
-            };
-            if(btnMap[newStatus]) {
-                document.getElementById(btnMap[newStatus]).classList.add('done');
-            }
-            if(newStatus === 'completed') {
-                 navigator.geolocation.clearWatch(riderWatchId);
-                 setTimeout(() => { showScreen('screen-rider-dashboard'); }, 3000);
+            
+            // Visual
+            const btnIdMap = {'heading_to_store':'btn-st-1', 'ordered':'btn-st-2', 'delivering':'btn-st-4', 'completed':'btn-st-5'};
+            if(btnIdMap[newSt]) document.getElementById(btnIdMap[newSt]).classList.add('done');
+
+            update(ref(db, 'orders/' + activeOrderData.key), { status: newSt });
+
+            if(newSt === 'completed') {
+                if(riderWatchId) navigator.geolocation.clearWatch(riderWatchId);
+                alert("عمل رائع! تم إنهاء المهمة.");
+                setTimeout(() => {
+                    showScreen('screen-rider-dashboard');
+                }, 2000);
             }
         };
 
         window.uploadInvoice = () => {
             const file = document.getElementById('invoice-file').files[0];
-            if(!file || !activeOrderData) return;
-
-            const storageRef = sRef(storage, 'invoices/' + activeOrderData.key + '_' + Date.now());
+            if(!file) return alert("اختر صورة أولاً");
             
-            uploadBytes(storageRef, file).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((url) => {
-                    // Save URL to Order in DB
-                    update(ref(db, 'orders/' + activeOrderData.key), {
-                        invoiceUrl: url
-                    });
+            document.getElementById('btn-upload').innerText = "جاري الرفع...";
+            const sRefImg = sRef(storage, 'invoices/' + activeOrderData.key + '_' + Date.now());
+            
+            uploadBytes(sRefImg, file).then((snap) => {
+                getDownloadURL(snap.ref).then((url) => {
+                    update(ref(db, 'orders/' + activeOrderData.key), { invoiceUrl: url });
                     document.getElementById('invoice-preview').src = url;
-                    alert("تم إرسال الفاتورة");
+                    document.getElementById('invoice-preview').style.display = 'block';
+                    document.getElementById('btn-upload').innerText = "تم الرفع";
                 });
-            }).catch(err => alert("خطأ في الرفع: " + err.message));
+            });
         };
 
-        // --- Map Utilities ---
-        
-        // Icons
-        const customerIcon = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/236/236831.png', // Anime person-ish
-            iconSize: [40, 40]
-        });
-        const bikeIcon = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/171/171250.png', // Motorbike
-            iconSize: [40, 40]
-        });
+        // --- Shared Helper Functions ---
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(id).classList.add('active-screen');
+            // Map resize fix
+            setTimeout(() => { if(map) map.invalidateSize(); }, 500);
+        };
 
-        function initCustomerMap(lat, lng) {
-            if(map) map.remove();
-            map = L.map('map-customer').setView([lat, lng], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        window.setLang = (l) => {
+            currentLang = l;
+            document.dir = l === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
             
-            // Customer Marker
-            L.marker([lat, lng], {icon: customerIcon}).addTo(map).bindPopup("أنا (الزبون)");
-        }
-
-        function initRiderMap(custLat, custLng) {
-            if(map) map.remove();
-            map = L.map('map-rider').setView([custLat, custLng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-            // Customer Marker
-            L.marker([custLat, custLng], {icon: customerIcon}).addTo(map).bindPopup("الزبون");
-        }
-
-        function updateRiderMarkerOnMap(lat, lng, center = false) {
-            if(!map) return;
-            
-            if(markers['rider']) {
-                markers['rider'].setLatLng([lat, lng]);
-            } else {
-                markers['rider'] = L.marker([lat, lng], {icon: bikeIcon}).addTo(map).bindPopup("الموصل");
+            // Update simple text
+            for (const [key, val] of Object.entries(texts[l])) {
+                const el = document.getElementById('txt-' + key) || document.getElementById('lbl-' + key);
+                if(el) el.innerText = val;
             }
+        };
 
-            if(center) map.setView([lat, lng], 16);
+        // Map Logic
+        const custIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/3003/3003984.png', iconSize:[40,40]}); // Person
+        const bikeIcon = L.icon({iconUrl:'https://cdn-icons-png.flaticon.com/512/713/713311.png', iconSize:[40,40]}); // Bike
+
+        function initMap(divId, lat, lng, isRiderView) {
+            if(map) { map.remove(); markers = {}; }
+            map = L.map(divId).setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            // Customer Marker (Static)
+            markers['customer'] = L.marker([lat, lng], {icon: custIcon}).addTo(map)
+                .bindPopup(isRiderView ? "الزبون" : "موقعك").openPopup();
         }
 
-        function getStatusText(st) {
-            const d = {
-                'pending': 'جاري البحث', 'accepted': 'تم القبول',
-                'heading_to_store': 'في الطريق للمحل', 'ordered': 'تم طلب الأكل',
-                'delivering': 'جاي في الطريق', 'completed': 'وصلت'
-            };
-            return d[st] || st;
+        function updateMarker(type, lat, lng) {
+            if(!map) return;
+            if(markers[type]) {
+                markers[type].setLatLng([lat, lng]);
+            } else {
+                let icon = type === 'rider' ? bikeIcon : custIcon;
+                markers[type] = L.marker([lat, lng], {icon: icon}).addTo(map);
+            }
+            if(type === 'rider') map.panTo([lat, lng]);
         }
-
-        function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-            var R = 6371; // Radius of the earth in km
-            var dLat = deg2rad(lat2-lat1);  
-            var dLon = deg2rad(lon2-lon1); 
-            var a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2); 
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-            var d = R * c; 
-            return d;
-        }
-        function deg2rad(deg) { return deg * (Math.PI/180); }
-
     </script>
 </body>
 </html>
